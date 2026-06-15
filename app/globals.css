@@ -1,26 +1,224 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
+
+/* ──────────────────────────────────────────────────────────────
+   MARCA eLunch — tokens de diseño (MARCA_Y_DISENO.md)
+   Los colores de marca se mapean a las variables semánticas de
+   shadcn/ui para que todos los componentes hereden la identidad.
+   ────────────────────────────────────────────────────────────── */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* ── Colores de marca ── */
+  --color-brand-coral:  var(--brand-coral);
+  --color-brand-forest: var(--brand-forest);
+  --color-brand-amber:  var(--brand-amber);
+  --color-brand-cocoa:  var(--brand-cocoa);
+  --color-brand-cream:  var(--brand-cream);
+
+  /* ── Superficies y neutros ── */
+  --color-surface:       var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-text-muted:    var(--text-muted);
+
+  /* ── Semáforos de liquidez ── */
+  --color-status-ok:       var(--status-ok);
+  --color-status-ok-bg:    var(--status-ok-bg);
+  --color-status-warn:     var(--status-warn);
+  --color-status-warn-bg:  var(--status-warn-bg);
+  --color-status-danger:   var(--status-danger);
+  --color-status-danger-bg: var(--status-danger-bg);
+  --color-status-info:     var(--status-info);
+  --color-status-info-bg:  var(--status-info-bg);
+
+  /* ── Variables semánticas de shadcn/ui (mapeadas a marca) ── */
+  --color-background:    var(--background);
+  --color-foreground:    var(--foreground);
+  --color-card:          var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover:       var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary:       var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary:     var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted:         var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent:        var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive:   var(--destructive);
+  --color-border:        var(--border);
+  --color-input:         var(--input);
+  --color-ring:          var(--ring);
+  --color-sidebar:       var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring:  var(--sidebar-ring);
+
+  /* ── Tipografía ── */
+  --font-display: var(--font-fredoka);
+  --font-sans:    var(--font-inter);
+  --font-mono:    var(--font-geist-mono);
+
+  /* ── Radio de borde ── */
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  /* ════════════════════════════════════════
+     COLORES DE MARCA eLunch
+     ════════════════════════════════════════ */
+  --brand-coral:  #ff673e;   /* Coral: primario / CTA */
+  --brand-forest: #074230;   /* Verde bosque: sidebar / UI profunda */
+  --brand-amber:  #ffaa00;   /* Ámbar: acento secundario */
+  --brand-cocoa:  #352a22;   /* Café oscuro: texto principal */
+  --brand-cream:  #fff6e2;   /* Crema: fondo de la app */
+
+  /* ── Superficies y neutros de datos ── */
+  --surface:       #ffffff;
+  --surface-muted: #fbf7ee;
+  --border-color:  #e7e0d2;
+  --text-muted:    #6f655c;
+
+  /* ════════════════════════════════════════
+     SEMÁFOROS DE LIQUIDEZ
+     (separados de la marca para no confundir
+      el rojo de vencido con el coral de CTA)
+     ════════════════════════════════════════ */
+  --status-ok:         #1f7a52;   --status-ok-bg:      #e6f2ec;
+  --status-warn:       #ffaa00;   --status-warn-bg:    #fff3d6;
+  --status-danger:     #e5432a;   --status-danger-bg:  #fde8e3;
+  --status-info:       #074230;   --status-info-bg:    #e6efec;
+
+  /* ════════════════════════════════════════
+     VARIABLES SEMÁNTICAS DE shadcn/ui
+     (mapeadas a los colores de marca)
+     ════════════════════════════════════════ */
+
+  /* Fondo principal: crema cálida de eLunch */
+  --background:    var(--brand-cream);
+  --foreground:    var(--brand-cocoa);
+
+  /* Tarjetas y popovers: fondo blanco para legibilidad de datos */
+  --card:              var(--surface);
+  --card-foreground:   var(--brand-cocoa);
+  --popover:           var(--surface);
+  --popover-foreground: var(--brand-cocoa);
+
+  /* Color primario: coral eLunch — botones CTA, links activos */
+  --primary:           var(--brand-coral);
+  --primary-foreground: #ffffff;
+
+  /* Secundario: superficie muted crema atenuada */
+  --secondary:              var(--surface-muted);
+  --secondary-foreground:   var(--brand-cocoa);
+
+  /* Muted: para texto de apoyo y fondos sutiles */
+  --muted:              var(--surface-muted);
+  --muted-foreground:   var(--text-muted);
+
+  /* Accent: ámbar para highlights y badges informativos */
+  --accent:             var(--brand-amber);
+  --accent-foreground:  var(--brand-cocoa);
+
+  /* Destructivo: rojo de sistema (separado del coral de marca) */
+  --destructive:        var(--status-danger);
+
+  /* Bordes e inputs */
+  --border: var(--border-color);
+  --input:  var(--surface);
+
+  /* Foco: anillo coral para accesibilidad visible */
+  --ring:   var(--brand-coral);
+
+  /* Sidebar de navegación: verde bosque con isotipo crema */
+  --sidebar:                      var(--brand-forest);
+  --sidebar-foreground:           var(--brand-cream);
+  --sidebar-primary:              var(--brand-coral);
+  --sidebar-primary-foreground:   #ffffff;
+  --sidebar-accent:               rgba(255, 246, 226, 0.1);
+  --sidebar-accent-foreground:    var(--brand-cream);
+  --sidebar-border:               rgba(255, 246, 226, 0.15);
+  --sidebar-ring:                 var(--brand-coral);
+
+  /* Radio de borde: levemente redondeado */
+  --radius: 0.5rem;
+}
+
+/* ══════════════════════════════════════════════════
+   BASE STYLES
+   ══════════════════════════════════════════════════ */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    box-sizing: border-box;
+  }
+
+  html {
+    /* Números tabulares por defecto — crítico para tablas financieras */
+    font-feature-settings: "tnum" 1, "kern" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    /* Inter para cuerpo de texto, sistema como fallback */
+    font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+    line-height: 1.5;
+  }
+
+  /* Títulos en Fredoka (display de marca con personalidad) */
+  h1, h2, h3, .font-display {
+    font-family: var(--font-fredoka), var(--font-inter), sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  /* Escala tipográfica */
+  h1 { @apply text-3xl leading-tight;   }   /* 30px / 36px */
+  h2 { @apply text-2xl leading-snug;    }   /* 24px / 30px */
+  h3 { @apply text-xl  leading-snug;    }   /* 20px / 26px */
+
+  /* Foco visible: anillo coral para accesibilidad AA */
+  :focus-visible {
+    outline: 2px solid var(--brand-coral);
+    outline-offset: 2px;
+  }
+
+  /* Números tabulares en contextos financieros */
+  .tabular-nums,
+  table td,
+  .font-mono {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ══════════════════════════════════════════════════
+   UTILIDADES DE MARCA
+   Helpers semánticos para los colores de semáforo
+   ══════════════════════════════════════════════════ */
+@layer utilities {
+  .badge-ok      { background: var(--status-ok-bg);      color: var(--status-ok);      }
+  .badge-warn    { background: var(--status-warn-bg);    color: var(--status-warn);    }
+  .badge-danger  { background: var(--status-danger-bg);  color: var(--status-danger);  }
+  .badge-info    { background: var(--status-info-bg);    color: var(--status-info);    }
+
+  /* Superficie de datos: blanco puro para máxima legibilidad en tablas */
+  .data-surface {
+    background: var(--surface);
+  }
 }
