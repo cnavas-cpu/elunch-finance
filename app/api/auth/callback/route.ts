@@ -10,7 +10,11 @@ import { cookies } from "next/headers";
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/";
+
+  // Seguridad: validar que `next` sea una ruta relativa segura.
+  // Evita open redirect: si fuera "//evil.com" o "/\evil.com" podría redirigir fuera.
+  const nextParam = searchParams.get("next") ?? "/";
+  const safeNext = /^\/(?![/\\])/.test(nextParam) ? nextParam : "/";
 
   if (code) {
     const cookieStore = await cookies();
@@ -35,8 +39,8 @@ export async function GET(request: NextRequest) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
-      // Redirigir al dashboard (o a la URL que especificó el parámetro "next")
-      return NextResponse.redirect(`${origin}${next}`);
+      // Redirigir al dashboard (o ruta interna validada)
+      return NextResponse.redirect(`${origin}${safeNext}`);
     }
   }
 
