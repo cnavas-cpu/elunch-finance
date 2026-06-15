@@ -1,7 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
-import { sendMagicLink } from "@/app/actions/auth";
+import { useActionState, useState } from "react";
+import { login } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,26 +9,13 @@ import Image from "next/image";
 
 type FormState = { error?: string; success?: boolean } | null;
 
-/**
- * Formulario de login por magic link.
- *
- * Checklist login-flow P0:
- * ✅ Label visible sobre el input (nunca solo placeholder)
- * ✅ Touch target mínimo 44px (h-11 = 44px)
- * ✅ Error state con texto rojo bajo el campo
- * ✅ Botón CTA con hover/active/disabled states
- *
- * Checklist P1:
- * ✅ Spinner de carga durante el submit
- * ✅ Focus state con anillo coral (--ring = brand-coral)
- */
 export default function LoginForm() {
   const [state, action, isPending] = useActionState<FormState, FormData>(
-    sendMagicLink,
+    login,
     null
   );
+  const [showPassword, setShowPassword] = useState(false);
 
-  // Estado de éxito: mostrar pantalla de confirmación
   if (state?.success) {
     return (
       <div className="text-center py-2">
@@ -45,8 +32,7 @@ export default function LoginForm() {
           ¡Revisa tu correo!
         </h2>
         <p className="text-sm text-text-muted leading-relaxed">
-          Te enviamos un enlace de acceso. Haz clic en él para entrar al
-          sistema.
+          Te enviamos un enlace de acceso. Haz clic en él para entrar al sistema.
         </p>
         <p className="text-xs text-text-muted mt-3">
           ¿No llegó? Revisa la carpeta de spam o{" "}
@@ -65,16 +51,11 @@ export default function LoginForm() {
 
   return (
     <form action={action} className="space-y-5" noValidate>
-      {/* ── Campo de correo electrónico ── */}
+      {/* Email */}
       <div className="space-y-2">
-        {/* Label visible — checklist P0 ✅ */}
-        <Label
-          htmlFor="email"
-          className="text-sm font-medium text-brand-cocoa"
-        >
+        <Label htmlFor="email" className="text-sm font-medium text-brand-cocoa">
           Correo electrónico
         </Label>
-
         <Input
           id="email"
           name="email"
@@ -84,31 +65,59 @@ export default function LoginForm() {
           placeholder="tu@correo.com"
           disabled={isPending}
           aria-invalid={!!state?.error}
-          aria-describedby={state?.error ? "email-error" : undefined}
           className={[
             "h-11 text-base bg-surface border-border",
             "focus-visible:ring-2 focus-visible:ring-brand-coral focus-visible:ring-offset-0",
-            "placeholder:text-text-muted",
-            "disabled:opacity-60 disabled:cursor-not-allowed",
+            "placeholder:text-text-muted disabled:opacity-60 disabled:cursor-not-allowed",
             state?.error ? "border-status-danger" : "",
           ]
             .filter(Boolean)
             .join(" ")}
         />
-
-        {/* Error state bajo el campo — checklist P0 ✅ */}
-        {state?.error && (
-          <p
-            id="email-error"
-            role="alert"
-            className="text-xs text-status-danger"
-          >
-            {state.error}
-          </p>
-        )}
       </div>
 
-      {/* ── Botón CTA ── */}
+      {/* Contraseña (opcional) */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label htmlFor="password" className="text-sm font-medium text-brand-cocoa">
+            Contraseña
+          </Label>
+          <span className="text-xs text-text-muted">opcional</span>
+        </div>
+        <div className="relative">
+          <Input
+            id="password"
+            name="password"
+            type={showPassword ? "text" : "password"}
+            autoComplete="current-password"
+            placeholder="Déjala vacía para enlace por correo"
+            disabled={isPending}
+            className={[
+              "h-11 text-base bg-surface border-border pr-11",
+              "focus-visible:ring-2 focus-visible:ring-brand-coral focus-visible:ring-offset-0",
+              "placeholder:text-text-muted disabled:opacity-60 disabled:cursor-not-allowed",
+            ].join(" ")}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-brand-cocoa transition-colors"
+            tabIndex={-1}
+            aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+          >
+            {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+          </button>
+        </div>
+      </div>
+
+      {/* Error */}
+      {state?.error && (
+        <p role="alert" className="text-xs text-status-danger -mt-2">
+          {state.error}
+        </p>
+      )}
+
+      {/* CTA */}
       <Button
         type="submit"
         disabled={isPending}
@@ -118,48 +127,51 @@ export default function LoginForm() {
           "hover:bg-brand-coral/90 active:bg-brand-coral/80",
           "focus-visible:ring-2 focus-visible:ring-brand-coral focus-visible:ring-offset-2",
           "disabled:opacity-60 disabled:cursor-not-allowed",
-          "transition-all duration-150",
-          "rounded-lg",
+          "transition-all duration-150 rounded-lg",
         ].join(" ")}
         aria-busy={isPending}
       >
         {isPending ? (
-          /* Spinner de carga — checklist P1 ✅ */
           <span className="flex items-center gap-2">
             <SpinnerIcon />
-            Enviando enlace...
+            Ingresando...
           </span>
         ) : (
-          "Enviar enlace de acceso"
+          "Entrar"
         )}
       </Button>
+
+      <p className="text-center text-xs text-text-muted">
+        Sin contraseña → te enviamos un enlace al correo
+      </p>
     </form>
   );
 }
 
-/** Ícono de spinner animado para el estado de carga */
+function EyeIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+function EyeOffIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+      <line x1="1" y1="1" x2="23" y2="23" />
+    </svg>
+  );
+}
+
 function SpinnerIcon() {
   return (
-    <svg
-      className="animate-spin h-4 w-4"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-    >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      />
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-      />
+    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
     </svg>
   );
 }
