@@ -62,7 +62,7 @@ export default function CuentasClient({ cuentas: initial }: { cuentas: CuentaBan
       <TableShell>
         <Table>
           <TableHeader>
-            <TableRow className="bg-brand-cream/60 hover:bg-brand-cream/60">
+            <TableRow className="bg-brand-cream/60 hover:bg-brand-cream/60 dark:bg-surface-muted dark:hover:bg-surface-muted">
               <TableHead className="text-xs font-semibold text-brand-cocoa w-20">ID</TableHead>
               <TableHead className="text-xs font-semibold text-brand-cocoa">Nombre</TableHead>
               <TableHead className="text-xs font-semibold text-brand-cocoa">Tipo</TableHead>

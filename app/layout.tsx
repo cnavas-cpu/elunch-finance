@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Fredoka, Inter } from "next/font/google";
+import { ThemeProvider } from "next-themes";
 import "./globals.css";
 
 // ── Fuente display de marca eLunch (títulos, H1/H2, login) ──
@@ -34,9 +35,12 @@ export default function RootLayout({
     <html
       lang="es"
       className={`${fredoka.variable} ${inter.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        {children}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

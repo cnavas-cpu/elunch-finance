@@ -158,6 +158,43 @@
 }
 
 /* ══════════════════════════════════════════════════
+   MODO OSCURO — tokens cálidos (café profundo)
+   Se activa con class="dark" en <html> via next-themes
+   ══════════════════════════════════════════════════ */
+.dark {
+  /* ── Texto principal: crema cálida en lugar de café oscuro ── */
+  --brand-cocoa: #f0e6d8;
+  /* brand-coral, brand-forest, brand-amber permanecen (funcionan en oscuro) */
+
+  /* ── Superficies oscuras cálidas — no frío/OLED ── */
+  --surface:        #241e19;
+  --surface-muted:  #2c2419;
+  --border-color:   #3d3028;
+  --text-muted:     #a0917f;
+
+  /* ── Semáforos más brillantes para fondos oscuros ── */
+  --status-ok:          #34c77a;   --status-ok-bg:       #0d2e1a;
+  --status-warn:        #ffaa00;   --status-warn-bg:     #2a2000;
+  --status-danger:      #f06050;   --status-danger-bg:   #2d1210;
+  --status-info:        #5bb595;   --status-info-bg:     #0b2219;
+
+  /* ── Variables semánticas de shadcn/ui ── */
+  --background:             #1c1712;
+  --foreground:             #f0e6d8;
+  --card:                   #241e19;
+  --card-foreground:        #f0e6d8;
+  --popover:                #241e19;
+  --popover-foreground:     #f0e6d8;
+  --secondary:              #2c2419;
+  --secondary-foreground:   #f0e6d8;
+  --muted:                  #2c2419;
+  --muted-foreground:       #a0917f;
+  --accent-foreground:      #f0e6d8;
+  --border:                 #3d3028;
+  --input:                  #241e19;
+}
+
+/* ══════════════════════════════════════════════════
    BASE STYLES
    ══════════════════════════════════════════════════ */
 @layer base {

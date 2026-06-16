@@ -164,7 +164,7 @@ export function CatalogoDialog({
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="sm:max-w-lg bg-surface">
         <DialogHeader>
-          <DialogTitle className="font-display text-brand-forest">{titulo}</DialogTitle>
+          <DialogTitle className="font-display text-brand-forest dark:text-foreground">{titulo}</DialogTitle>
         </DialogHeader>
         <form
           ref={formRef}
@@ -234,7 +234,7 @@ export function useServerAction(
 export function EmptyState({ mensaje = "No hay registros.", onNew }: { mensaje?: string; onNew?: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-14 text-center gap-3">
-      <div className="w-10 h-10 rounded-full bg-brand-cream flex items-center justify-center text-brand-cocoa/30">
+      <div className="w-10 h-10 rounded-full bg-brand-cream dark:bg-surface-muted flex items-center justify-center text-brand-cocoa/30 dark:text-foreground/20">
         <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" aria-hidden="true">
           <path fillRule="evenodd" d="M10 2a8 8 0 100 16A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4zm0 8a1 1 0 100 2 1 1 0 000-2zm-.25-6.75a.75.75 0 011.5 0v4a.75.75 0 01-1.5 0v-4z" clipRule="evenodd" />
         </svg>

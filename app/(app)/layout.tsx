@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from "@/lib/db/server";
 import LogoutButton from "@/components/logout-button";
 import { SidebarNav } from "@/components/sidebar-nav";
 import { AppHeader } from "@/components/app-header";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Toaster } from "@/components/ui/sonner";
 
 /**
@@ -37,7 +38,7 @@ export default async function AppLayout({
   const usuario = usuarioData as { nombre: string; rol: string } | null;
 
   return (
-    <div className="min-h-screen flex bg-brand-cream">
+    <div className="min-h-screen flex bg-background">
       {/* ════════════════════════════════════════
           SIDEBAR — verde bosque con identidad eLunch
           ════════════════════════════════════════ */}
@@ -81,6 +82,7 @@ export default async function AppLayout({
               </p>
             )}
           </div>
+          <ThemeToggle />
           <LogoutButton />
         </div>
       </aside>

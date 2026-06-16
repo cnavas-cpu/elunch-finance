@@ -62,7 +62,7 @@ export default function TiposCostoClient({ tipos: initial }: { tipos: TipoCosto[
       <TableShell>
         <Table>
           <TableHeader>
-            <TableRow className="bg-brand-cream/60 hover:bg-brand-cream/60">
+            <TableRow className="bg-brand-cream/60 hover:bg-brand-cream/60 dark:bg-surface-muted dark:hover:bg-surface-muted">
               <TableHead className="text-xs font-semibold text-brand-cocoa w-20">ID</TableHead>
               <TableHead className="text-xs font-semibold text-brand-cocoa">Tag</TableHead>
               <TableHead className="text-xs font-semibold text-brand-cocoa">Grupo</TableHead>
