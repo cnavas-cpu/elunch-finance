@@ -243,3 +243,134 @@ export async function deleteCuenta(id: string): Promise<{ error?: string }> {
   revalidatePath("/catalogos/cuentas");
   return {};
 }
+
+// ── Tipos de costo ───────────────────────────────────────
+
+const TipoCostoSchema = z.object({
+  id: z.string().min(1).max(10).trim(),
+  tag: z.string().min(1, "El tag es obligatorio.").max(60).trim(),
+  grupo: z.string().max(60).nullable().optional(),
+  descripcion: z.string().max(300).nullable().optional(),
+});
+
+export type TipoCostoState = { error?: string; ok?: boolean } | null;
+
+export async function upsertTipoCosto(
+  _prev: TipoCostoState,
+  formData: FormData
+): Promise<TipoCostoState> {
+  const raw = fd(formData);
+  const result = TipoCostoSchema.safeParse(raw);
+  if (!result.success) {
+    return { error: result.error.issues[0]?.message ?? "Datos inválidos." };
+  }
+  const supabase = await createSupabaseServerClient();
+  const isNew = formData.get("_accion") === "nuevo";
+  const d = result.data;
+  const row = { id: d.id, tag: d.tag, grupo: d.grupo ?? null, descripcion: d.descripcion ?? null };
+  const { error } = isNew
+    ? await dbInsert(supabase, "tipos_costo", row)
+    : await dbUpdate(supabase, "tipos_costo", row, "id", row.id);
+  if (error) return { error: "No se pudo guardar el tipo de costo. " + error.message };
+  revalidatePath("/catalogos/tipos-costo");
+  return { ok: true };
+}
+
+export async function deleteTipoCosto(id: string): Promise<{ error?: string }> {
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.from("tipos_costo").delete().eq("id", id);
+  if (error) return { error: "No se pudo eliminar. Verifica que ningún proveedor use este tipo. " + error.message };
+  revalidatePath("/catalogos/tipos-costo");
+  return {};
+}
+
+// ── Categorías de gasto ──────────────────────────────────
+
+const CategoriaGastoSchema = z.object({
+  id: z.string().min(1).max(10).trim(),
+  nombre: z.string().min(1, "El nombre es obligatorio.").max(100).trim(),
+  naturaleza: z.string().max(60).nullable().optional(),
+  descripcion: z.string().max(300).nullable().optional(),
+});
+
+export type CategoriaGastoState = { error?: string; ok?: boolean } | null;
+
+export async function upsertCategoriaGasto(
+  _prev: CategoriaGastoState,
+  formData: FormData
+): Promise<CategoriaGastoState> {
+  const raw = fd(formData);
+  const result = CategoriaGastoSchema.safeParse(raw);
+  if (!result.success) {
+    return { error: result.error.issues[0]?.message ?? "Datos inválidos." };
+  }
+  const supabase = await createSupabaseServerClient();
+  const isNew = formData.get("_accion") === "nuevo";
+  const d = result.data;
+  const row = { id: d.id, nombre: d.nombre, naturaleza: d.naturaleza ?? null, descripcion: d.descripcion ?? null };
+  const { error } = isNew
+    ? await dbInsert(supabase, "categorias_gasto", row)
+    : await dbUpdate(supabase, "categorias_gasto", row, "id", row.id);
+  if (error) return { error: "No se pudo guardar la categoría. " + error.message };
+  revalidatePath("/catalogos/categorias-gasto");
+  return { ok: true };
+}
+
+export async function deleteCategoriaGasto(id: string): Promise<{ error?: string }> {
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.from("categorias_gasto").delete().eq("id", id);
+  if (error) return { error: "No se pudo eliminar. " + error.message };
+  revalidatePath("/catalogos/categorias-gasto");
+  return {};
+}
+
+// ── Formas de pago ───────────────────────────────────────
+
+const FormaPagoSchema = z.object({
+  id: z.string().min(1).max(10).trim(),
+  nombre: z.string().min(1, "El nombre es obligatorio.").max(100).trim(),
+  tipo: z.string().max(30).nullable().optional(),
+  afecta_cash: z.enum(["true", "false", ""]).nullable().optional(),
+  genera_cxc_cxp: z.enum(["true", "false"]).default("false"),
+  notas: z.string().max(300).nullable().optional(),
+});
+
+export type FormaPagoState = { error?: string; ok?: boolean } | null;
+
+export async function upsertFormaPago(
+  _prev: FormaPagoState,
+  formData: FormData
+): Promise<FormaPagoState> {
+  const raw = fd(formData);
+  const result = FormaPagoSchema.safeParse(raw);
+  if (!result.success) {
+    return { error: result.error.issues[0]?.message ?? "Datos inválidos." };
+  }
+  const supabase = await createSupabaseServerClient();
+  const isNew = formData.get("_accion") === "nuevo";
+  const d = result.data;
+  const afectaCash =
+    d.afecta_cash === "true" ? true : d.afecta_cash === "false" ? false : null;
+  const row = {
+    id: d.id,
+    nombre: d.nombre,
+    tipo: d.tipo ?? null,
+    afecta_cash: afectaCash,
+    genera_cxc_cxp: d.genera_cxc_cxp === "true",
+    notas: d.notas ?? null,
+  };
+  const { error } = isNew
+    ? await dbInsert(supabase, "formas_pago", row)
+    : await dbUpdate(supabase, "formas_pago", row, "id", row.id);
+  if (error) return { error: "No se pudo guardar la forma de pago. " + error.message };
+  revalidatePath("/catalogos/formas-pago");
+  return { ok: true };
+}
+
+export async function deleteFormaPago(id: string): Promise<{ error?: string }> {
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.from("formas_pago").delete().eq("id", id);
+  if (error) return { error: "No se pudo eliminar. " + error.message };
+  revalidatePath("/catalogos/formas-pago");
+  return {};
+}
