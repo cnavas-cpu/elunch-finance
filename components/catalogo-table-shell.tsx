@@ -69,8 +69,9 @@ export function DeleteButton({
     <button
       onClick={handleClick}
       disabled={busy}
+      title={confirming ? "Haz clic para confirmar" : "Eliminar registro"}
       className={[
-        "text-xs px-2 py-1 rounded transition-colors",
+        "text-xs px-2 py-1 rounded transition-colors duration-150 cursor-pointer",
         confirming
           ? "bg-status-danger text-white hover:bg-status-danger/80"
           : "text-text-muted hover:text-status-danger hover:bg-status-danger/10",
@@ -92,6 +93,8 @@ export function FormField({
   type = "text",
   placeholder,
   hint,
+  autoFocus,
+  autoComplete,
 }: {
   label: string;
   name: string;
@@ -100,6 +103,8 @@ export function FormField({
   type?: string;
   placeholder?: string;
   hint?: string;
+  autoFocus?: boolean;
+  autoComplete?: string;
 }) {
   return (
     <div className="space-y-1.5">
@@ -114,7 +119,9 @@ export function FormField({
         defaultValue={defaultValue ?? ""}
         required={required}
         placeholder={placeholder}
-        className="h-9 text-sm bg-surface border-border focus-visible:ring-2 focus-visible:ring-brand-coral focus-visible:ring-offset-0"
+        autoFocus={autoFocus}
+        autoComplete={autoComplete ?? "off"}
+        className="h-9 text-sm bg-surface border-border focus-visible:ring-2 focus-visible:ring-brand-coral focus-visible:ring-offset-0 transition-shadow duration-150"
       />
       {hint && <p className="text-xs text-text-muted">{hint}</p>}
     </div>
@@ -140,13 +147,27 @@ export function CatalogoDialog({
   busy: boolean;
   error?: string;
 }) {
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const timer = setTimeout(() => {
+      const first = formRef.current?.querySelector<HTMLElement>(
+        'input:not([type="hidden"]), select, textarea'
+      );
+      first?.focus();
+    }, 80);
+    return () => clearTimeout(timer);
+  }, [open]);
+
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="sm:max-w-md bg-surface">
+      <DialogContent className="sm:max-w-lg bg-surface">
         <DialogHeader>
           <DialogTitle className="font-display text-brand-forest">{titulo}</DialogTitle>
         </DialogHeader>
         <form
+          ref={formRef}
           onSubmit={(e) => {
             e.preventDefault();
             onSubmit(new FormData(e.currentTarget));
@@ -156,7 +177,7 @@ export function CatalogoDialog({
           {children}
 
           {error && (
-            <p role="alert" className="text-xs text-status-danger">
+            <p role="alert" className="text-xs text-status-danger bg-status-danger/5 border border-status-danger/20 rounded px-3 py-2">
               {error}
             </p>
           )}
@@ -164,7 +185,7 @@ export function CatalogoDialog({
           <DialogFooter className="pt-2 gap-2">
             <DialogClose
               disabled={busy}
-              className="inline-flex items-center justify-center rounded-md border border-border px-3 py-1.5 text-sm font-medium text-brand-cocoa bg-surface hover:bg-brand-cream/60 transition-colors disabled:opacity-50"
+              className="inline-flex items-center justify-center rounded-md border border-border px-3 py-1.5 text-sm font-medium text-brand-cocoa bg-surface hover:bg-brand-cream/60 transition-colors duration-150 disabled:opacity-50 cursor-pointer"
             >
               Cancelar
             </DialogClose>
@@ -172,7 +193,7 @@ export function CatalogoDialog({
               type="submit"
               size="sm"
               disabled={busy}
-              className="bg-brand-coral hover:bg-brand-coral/90 text-white disabled:opacity-60"
+              className="bg-brand-coral hover:bg-brand-coral/90 text-white disabled:opacity-60 transition-colors duration-150 cursor-pointer"
             >
               {busy ? "Guardando..." : "Guardar"}
             </Button>
@@ -215,18 +236,37 @@ export function EmptyState({ mensaje = "No hay registros.", onNew }: { mensaje?:
     <div className="flex flex-col items-center justify-center py-14 text-center gap-3">
       <div className="w-10 h-10 rounded-full bg-brand-cream flex items-center justify-center text-brand-cocoa/30">
         <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" aria-hidden="true">
-          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
+          <path fillRule="evenodd" d="M10 2a8 8 0 100 16A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4zm0 8a1 1 0 100 2 1 1 0 000-2zm-.25-6.75a.75.75 0 011.5 0v4a.75.75 0 01-1.5 0v-4z" clipRule="evenodd" />
         </svg>
       </div>
       <p className="text-sm text-text-muted">{mensaje}</p>
       {onNew && (
         <button
           onClick={onNew}
-          className="text-xs text-brand-coral hover:text-brand-coral/80 font-medium transition-colors"
+          className="text-xs text-brand-coral hover:text-brand-coral/80 font-medium transition-colors duration-150 cursor-pointer"
         >
           + Crear el primero
         </button>
       )}
+    </div>
+  );
+}
+
+// ── Wrapper de tabla con scroll horizontal ──────────────
+
+export function TableShell({
+  children,
+  empty,
+}: {
+  children: React.ReactNode;
+  empty?: React.ReactNode;
+}) {
+  return (
+    <div className="border border-border rounded-lg bg-surface overflow-hidden">
+      <div className="overflow-x-auto">
+        {children}
+      </div>
+      {empty}
     </div>
   );
 }
@@ -259,7 +299,7 @@ export function SearchBar({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="h-8 pl-8 text-sm bg-surface border-border focus-visible:ring-2 focus-visible:ring-brand-coral focus-visible:ring-offset-0 w-56"
+        className="h-8 pl-8 text-sm bg-surface border-border focus-visible:ring-2 focus-visible:ring-brand-coral focus-visible:ring-offset-0 w-48 sm:w-56 transition-shadow duration-150"
       />
     </div>
   );

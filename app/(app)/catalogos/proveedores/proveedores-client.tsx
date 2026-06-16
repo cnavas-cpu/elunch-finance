@@ -8,6 +8,7 @@ import {
   DeleteButton,
   FormField,
   CatalogoDialog,
+  TableShell,
   useServerAction,
   SearchBar,
 } from "@/components/catalogo-table-shell";
@@ -133,7 +134,7 @@ export default function ProveedoresClient({
       </div>
 
       {/* Tabla */}
-      <div className="border border-border rounded-lg overflow-hidden bg-surface">
+      <TableShell>
         <Table>
           <TableHeader>
             <TableRow className="bg-brand-cream/60 hover:bg-brand-cream/60">
@@ -186,7 +187,7 @@ export default function ProveedoresClient({
             )}
           </TableBody>
         </Table>
-      </div>
+      </TableShell>
 
       {/* Diálogo de creación / edición */}
       <CatalogoDialog

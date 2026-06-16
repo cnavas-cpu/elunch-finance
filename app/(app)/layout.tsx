@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from "@/lib/db/server";
 import LogoutButton from "@/components/logout-button";
 import { SidebarNav } from "@/components/sidebar-nav";
 import { AppHeader } from "@/components/app-header";
+import { Toaster } from "@/components/ui/sonner";
 
 /**
  * Layout del área protegida — todos los módulos operativos.
@@ -96,6 +97,8 @@ export default async function AppLayout({
           {children}
         </div>
       </main>
+
+      <Toaster position="bottom-right" richColors />
     </div>
   );
 }

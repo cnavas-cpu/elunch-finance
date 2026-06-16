@@ -7,6 +7,7 @@ import {
   DeleteButton,
   FormField,
   CatalogoDialog,
+  TableShell,
   useServerAction,
   SearchBar,
   EmptyState,
@@ -58,7 +59,7 @@ export default function TiposCostoClient({ tipos: initial }: { tipos: TipoCosto[
         </Button>
       </div>
 
-      <div className="border border-border rounded-lg overflow-hidden bg-surface">
+      <TableShell>
         <Table>
           <TableHeader>
             <TableRow className="bg-brand-cream/60 hover:bg-brand-cream/60">
@@ -93,7 +94,7 @@ export default function TiposCostoClient({ tipos: initial }: { tipos: TipoCosto[
             onNew={busqueda ? undefined : openNew}
           />
         )}
-      </div>
+      </TableShell>
       <p className="text-xs text-text-muted mt-2">
         Si eliminas un tipo usado por algún proveedor, la app te avisará con un error.
       </p>

@@ -8,6 +8,7 @@ import {
   DeleteButton,
   FormField,
   CatalogoDialog,
+  TableShell,
   useServerAction,
 } from "@/components/catalogo-table-shell";
 import { Button } from "@/components/ui/button";
@@ -51,7 +52,7 @@ export default function ClientesClient({ clientes: initial }: { clientes: Client
         </Button>
       </div>
 
-      <div className="border border-border rounded-lg overflow-hidden bg-surface">
+      <TableShell>
         <Table>
           <TableHeader>
             <TableRow className="bg-brand-cream/60 hover:bg-brand-cream/60">
@@ -82,7 +83,7 @@ export default function ClientesClient({ clientes: initial }: { clientes: Client
             ))}
           </TableBody>
         </Table>
-      </div>
+      </TableShell>
 
       <CatalogoDialog
         open={dialogOpen}

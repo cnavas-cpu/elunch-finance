@@ -7,6 +7,7 @@ import {
   DeleteButton,
   FormField,
   CatalogoDialog,
+  TableShell,
   useServerAction,
   SearchBar,
   EmptyState,
@@ -72,7 +73,7 @@ export default function FormasPagoClient({ formas: initial }: { formas: FormaPag
         </Button>
       </div>
 
-      <div className="border border-border rounded-lg overflow-hidden bg-surface">
+      <TableShell>
         <Table>
           <TableHeader>
             <TableRow className="bg-brand-cream/60 hover:bg-brand-cream/60">
@@ -119,7 +120,7 @@ export default function FormasPagoClient({ formas: initial }: { formas: FormaPag
             onNew={busqueda ? undefined : openNew}
           />
         )}
-      </div>
+      </TableShell>
 
       <CatalogoDialog
         open={dialogOpen}

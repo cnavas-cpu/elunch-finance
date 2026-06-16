@@ -7,6 +7,7 @@ import {
   DeleteButton,
   FormField,
   CatalogoDialog,
+  TableShell,
   useServerAction,
   SearchBar,
   EmptyState,
@@ -90,7 +91,7 @@ export default function CategoriasGastoClient({ categorias: initial }: { categor
         </Button>
       </div>
 
-      <div className="border border-border rounded-lg overflow-hidden bg-surface">
+      <TableShell>
         <Table>
           <TableHeader>
             <TableRow className="bg-brand-cream/60 hover:bg-brand-cream/60">
@@ -131,7 +132,7 @@ export default function CategoriasGastoClient({ categorias: initial }: { categor
             onNew={busqueda || filtroNaturaleza ? undefined : openNew}
           />
         )}
-      </div>
+      </TableShell>
 
       <CatalogoDialog
         open={dialogOpen}
