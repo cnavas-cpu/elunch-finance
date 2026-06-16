@@ -22,8 +22,8 @@ const ESTADO_STYLE: Record<string, string> = {
   activa:      "bg-status-ok/15 text-status-ok border-status-ok/20",
   inactivo:    "bg-border/40 text-text-muted border-border/40",
   inactiva:    "bg-border/40 text-text-muted border-border/40",
-  programado:  "bg-brand-amber/15 text-brand-amber border-brand-amber/30",
-  programada:  "bg-brand-amber/15 text-brand-amber border-brand-amber/30",
+  programado:  "bg-brand-amber/15 text-[#7a5100] dark:text-brand-amber border-brand-amber/30",
+  programada:  "bg-brand-amber/15 text-[#7a5100] dark:text-brand-amber border-brand-amber/30",
 };
 
 export function EstadoBadge({ estado }: { estado: string }) {
@@ -73,7 +73,7 @@ export function DeleteButton({
       className={[
         "text-xs px-2 py-1 rounded transition-colors duration-150 cursor-pointer",
         confirming
-          ? "bg-status-danger text-white hover:bg-status-danger/80"
+          ? "bg-status-danger text-white dark:text-[#1c1712] hover:bg-status-danger/80"
           : "text-text-muted hover:text-status-danger hover:bg-status-danger/10",
         busy ? "opacity-50 cursor-not-allowed" : "",
       ].join(" ")}
@@ -185,7 +185,7 @@ export function CatalogoDialog({
           <DialogFooter className="pt-2 gap-2">
             <DialogClose
               disabled={busy}
-              className="inline-flex items-center justify-center rounded-md border border-border px-3 py-1.5 text-sm font-medium text-brand-cocoa bg-surface hover:bg-brand-cream/60 transition-colors duration-150 disabled:opacity-50 cursor-pointer"
+              className="inline-flex items-center justify-center rounded-md border border-border px-3 py-1.5 text-sm font-medium text-brand-cocoa bg-surface hover:bg-brand-cream/60 dark:hover:bg-white/10 transition-colors duration-150 disabled:opacity-50 cursor-pointer"
             >
               Cancelar
             </DialogClose>
@@ -193,7 +193,7 @@ export function CatalogoDialog({
               type="submit"
               size="sm"
               disabled={busy}
-              className="bg-brand-coral hover:bg-brand-coral/90 text-white disabled:opacity-60 transition-colors duration-150 cursor-pointer"
+              className="bg-brand-coral hover:bg-brand-coral/90 text-[#1c1712] disabled:opacity-60 transition-colors duration-150 cursor-pointer"
             >
               {busy ? "Guardando..." : "Guardar"}
             </Button>
@@ -234,7 +234,7 @@ export function useServerAction(
 export function EmptyState({ mensaje = "No hay registros.", onNew }: { mensaje?: string; onNew?: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-14 text-center gap-3">
-      <div className="w-10 h-10 rounded-full bg-brand-cream dark:bg-surface-muted flex items-center justify-center text-brand-cocoa/30 dark:text-foreground/20">
+      <div className="w-10 h-10 rounded-full bg-brand-cream dark:bg-surface-muted flex items-center justify-center text-brand-cocoa/30 dark:text-foreground/40">
         <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" aria-hidden="true">
           <path fillRule="evenodd" d="M10 2a8 8 0 100 16A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4zm0 8a1 1 0 100 2 1 1 0 000-2zm-.25-6.75a.75.75 0 011.5 0v4a.75.75 0 01-1.5 0v-4z" clipRule="evenodd" />
         </svg>

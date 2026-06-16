@@ -46,7 +46,7 @@ export default function ClientesClient({ clientes: initial }: { clientes: Client
         <Button
           size="sm"
           onClick={() => { reset(); setEditando(EMPTY); setDialogOpen(true); }}
-          className="bg-brand-coral hover:bg-brand-coral/90 text-white h-8 text-xs"
+          className="bg-brand-coral hover:bg-brand-coral/90 text-[#1c1712] h-8 text-xs"
         >
           + Nuevo cliente
         </Button>

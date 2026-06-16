@@ -21,7 +21,7 @@ import { toast } from "sonner";
 
 const NATURALEZA_COLOR: Record<string, string> = {
   Fijo:            "bg-brand-forest/10 text-brand-forest border-brand-forest/20",
-  Operativo:       "bg-brand-amber/10 text-brand-amber border-brand-amber/20",
+  Operativo:       "bg-brand-amber/10 text-[#7a5100] dark:text-brand-amber border-brand-amber/20",
   Variable:        "bg-brand-coral/10 text-brand-coral border-brand-coral/20",
   "Costo Directo Unidad": "bg-status-danger/10 text-status-danger border-status-danger/20",
   Financiero:      "bg-status-info/10 text-status-info border-status-info/20",
@@ -85,7 +85,7 @@ export default function CategoriasGastoClient({ categorias: initial }: { categor
         <Button
           size="sm"
           onClick={openNew}
-          className="ml-auto bg-brand-coral hover:bg-brand-coral/90 text-white h-8 text-xs"
+          className="ml-auto bg-brand-coral hover:bg-brand-coral/90 text-[#1c1712] h-8 text-xs"
         >
           + Nueva categoría
         </Button>

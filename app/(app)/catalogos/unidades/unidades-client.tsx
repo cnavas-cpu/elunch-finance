@@ -60,7 +60,7 @@ export default function UnidadesClient({
         <Button
           size="sm"
           onClick={() => { reset(); setEditando(EMPTY); setDialogOpen(true); }}
-          className="bg-brand-coral hover:bg-brand-coral/90 text-white h-8 text-xs"
+          className="bg-brand-coral hover:bg-brand-coral/90 text-[#1c1712] h-8 text-xs"
         >
           + Nueva unidad
         </Button>

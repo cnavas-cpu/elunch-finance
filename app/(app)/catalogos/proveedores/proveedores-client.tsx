@@ -126,7 +126,7 @@ export default function ProveedoresClient({
           <Button
             size="sm"
             onClick={openNuevo}
-            className="bg-brand-coral hover:bg-brand-coral/90 text-white h-8 text-xs"
+            className="bg-brand-coral hover:bg-brand-coral/90 text-[#1c1712] h-8 text-xs"
           >
             + Nuevo proveedor
           </Button>

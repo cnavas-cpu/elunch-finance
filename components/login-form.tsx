@@ -123,7 +123,7 @@ export default function LoginForm() {
         disabled={isPending}
         className={[
           "w-full h-11 text-sm font-semibold",
-          "bg-brand-coral text-white",
+          "bg-brand-coral text-[#1c1712]",
           "hover:bg-brand-coral/90 active:bg-brand-coral/80",
           "focus-visible:ring-2 focus-visible:ring-brand-coral focus-visible:ring-offset-2",
           "disabled:opacity-60 disabled:cursor-not-allowed",

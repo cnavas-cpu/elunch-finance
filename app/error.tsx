@@ -42,7 +42,7 @@ export default function GlobalError({
             onClick={reset}
             className={[
               "px-4 py-2 text-sm font-semibold rounded-lg",
-              "bg-brand-coral text-white",
+              "bg-brand-coral text-[#1c1712]",
               "hover:bg-brand-coral/90 transition-colors",
             ].join(" ")}
           >

@@ -67,7 +67,7 @@ export default function FormasPagoClient({ formas: initial }: { formas: FormaPag
         <Button
           size="sm"
           onClick={openNew}
-          className="bg-brand-coral hover:bg-brand-coral/90 text-white h-8 text-xs"
+          className="bg-brand-coral hover:bg-brand-coral/90 text-[#1c1712] h-8 text-xs"
         >
           + Nueva forma de pago
         </Button>

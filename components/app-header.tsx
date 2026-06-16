@@ -32,7 +32,7 @@ export function AppHeader() {
             <span className="text-text-muted/40 text-xs">/</span>
           </>
         )}
-        <h1 className="font-display text-base text-brand-forest">{title}</h1>
+        <h1 className="font-display text-base text-brand-forest dark:text-foreground">{title}</h1>
       </div>
       <span className="text-xs text-text-muted hidden sm:block">
         {new Date().toLocaleDateString("es-SV", { weekday: "short", day: "numeric", month: "short" })}

@@ -53,7 +53,7 @@ export default function TiposCostoClient({ tipos: initial }: { tipos: TipoCosto[
         <Button
           size="sm"
           onClick={openNew}
-          className="bg-brand-coral hover:bg-brand-coral/90 text-white h-8 text-xs"
+          className="bg-brand-coral hover:bg-brand-coral/90 text-[#1c1712] h-8 text-xs"
         >
           + Nuevo tipo
         </Button>

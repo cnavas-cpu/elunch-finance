@@ -82,7 +82,7 @@ export default function DashboardPage() {
             href="/cierre"
             className={[
               "inline-flex items-center gap-2 px-5 py-2.5",
-              "bg-brand-coral text-white text-sm font-semibold",
+              "bg-brand-coral text-[#1c1712] text-sm font-semibold",
               "rounded-lg hover:bg-brand-coral/90 active:bg-brand-coral/80",
               "transition-colors duration-150",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-coral focus-visible:ring-offset-2",
