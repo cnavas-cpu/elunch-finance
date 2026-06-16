@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type { CategoriaGasto } from "@/lib/db/catalogos";
 import { upsertCategoriaGasto, deleteCategoriaGasto } from "@/app/actions/catalogos";
 import {
@@ -8,6 +8,8 @@ import {
   FormField,
   CatalogoDialog,
   useServerAction,
+  SearchBar,
+  EmptyState,
 } from "@/components/catalogo-table-shell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,13 +27,25 @@ const NATURALEZA_COLOR: Record<string, string> = {
   Activo:          "bg-status-ok/10 text-status-ok border-status-ok/20",
 };
 
+const NATURALEZAS = ["Fijo", "Operativo", "Variable", "Costo Directo Unidad", "Financiero", "Activo"];
+
 const EMPTY: CategoriaGasto = { id: "", nombre: "", naturaleza: null, descripcion: null };
 
 export default function CategoriasGastoClient({ categorias: initial }: { categorias: CategoriaGasto[] }) {
   const [categorias, setCategorias] = useState(initial);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editando, setEditando] = useState<CategoriaGasto | null>(null);
+  const [busqueda, setBusqueda] = useState("");
+  const [filtroNaturaleza, setFiltroNaturaleza] = useState<string | null>(null);
   const isNuevo = !editando?.id;
+
+  const filtradas = useMemo(() => {
+    return categorias.filter((c) => {
+      const matchQ = !busqueda || c.nombre.toLowerCase().includes(busqueda.toLowerCase());
+      const matchN = !filtroNaturaleza || c.naturaleza === filtroNaturaleza;
+      return matchQ && matchN;
+    });
+  }, [categorias, busqueda, filtroNaturaleza]);
 
   const { state, busy, run, reset } = useServerAction(upsertCategoriaGasto, () => {
     setDialogOpen(false);
@@ -45,13 +59,32 @@ export default function CategoriasGastoClient({ categorias: initial }: { categor
     else { toast.success("Categoría eliminada."); setCategorias((p) => p.filter((c) => c.id !== id)); }
   };
 
+  const openNew = () => { reset(); setEditando(EMPTY); setDialogOpen(true); };
+
   return (
     <>
-      <div className="flex justify-end mb-4">
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <SearchBar value={busqueda} onChange={setBusqueda} placeholder="Buscar categoría..." />
+        <div className="flex gap-1.5 flex-wrap">
+          {NATURALEZAS.map((n) => (
+            <button
+              key={n}
+              onClick={() => setFiltroNaturaleza(filtroNaturaleza === n ? null : n)}
+              className={[
+                "text-xs px-2.5 py-1 rounded-full border transition-colors",
+                filtroNaturaleza === n
+                  ? (NATURALEZA_COLOR[n] ?? "bg-brand-coral/10 text-brand-coral border-brand-coral/30") + " font-medium"
+                  : "border-border text-text-muted hover:border-brand-coral/40 hover:text-brand-cocoa",
+              ].join(" ")}
+            >
+              {n}
+            </button>
+          ))}
+        </div>
         <Button
           size="sm"
-          onClick={() => { reset(); setEditando(EMPTY); setDialogOpen(true); }}
-          className="bg-brand-coral hover:bg-brand-coral/90 text-white h-8 text-xs"
+          onClick={openNew}
+          className="ml-auto bg-brand-coral hover:bg-brand-coral/90 text-white h-8 text-xs"
         >
           + Nueva categoría
         </Button>
@@ -69,7 +102,7 @@ export default function CategoriasGastoClient({ categorias: initial }: { categor
             </TableRow>
           </TableHeader>
           <TableBody>
-            {categorias.map((c) => (
+            {filtradas.map((c) => (
               <TableRow
                 key={c.id}
                 className="hover:bg-brand-cream/30 cursor-pointer"
@@ -92,6 +125,12 @@ export default function CategoriasGastoClient({ categorias: initial }: { categor
             ))}
           </TableBody>
         </Table>
+        {filtradas.length === 0 && (
+          <EmptyState
+            mensaje={busqueda || filtroNaturaleza ? "Sin resultados con ese filtro." : "No hay categorías de gasto."}
+            onNew={busqueda || filtroNaturaleza ? undefined : openNew}
+          />
+        )}
       </div>
 
       <CatalogoDialog
@@ -107,7 +146,17 @@ export default function CategoriasGastoClient({ categorias: initial }: { categor
             <input type="hidden" name="id" defaultValue={editando.id} />
             <div className="grid grid-cols-2 gap-3">
               <FormField label="ID" name="id" defaultValue={editando.id} required placeholder="GA-25" />
-              <FormField label="Naturaleza" name="naturaleza" defaultValue={editando.naturaleza} placeholder="Fijo, Operativo, Variable…" />
+              <div>
+                <label className="block text-xs font-medium text-brand-cocoa mb-1.5">Naturaleza</label>
+                <select
+                  name="naturaleza"
+                  defaultValue={editando.naturaleza ?? ""}
+                  className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm text-brand-cocoa focus:outline-none focus:ring-2 focus:ring-brand-coral/30"
+                >
+                  <option value="">Sin clasificar</option>
+                  {NATURALEZAS.map((n) => <option key={n} value={n}>{n}</option>)}
+                </select>
+              </div>
             </div>
             <FormField label="Nombre" name="nombre" defaultValue={editando.nombre} required />
             <FormField label="Descripción" name="descripcion" defaultValue={editando.descripcion} placeholder="Opcional" />

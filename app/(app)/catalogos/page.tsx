@@ -83,7 +83,7 @@ const CATALOGOS = [
   {
     href: "/catalogos/formas-pago",
     titulo: "Formas de Pago",
-    descripcion: "Cash, tarjeta, transferencia, crédito CXC y CXP (8). Solo lectura.",
+    descripcion: "Cash, tarjeta, transferencia, crédito CXC y CXP (8).",
     badge: "8",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="w-6 h-6" aria-hidden="true">

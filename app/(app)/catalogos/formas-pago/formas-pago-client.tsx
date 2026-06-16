@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type { FormaPago } from "@/lib/db/catalogos";
 import { upsertFormaPago, deleteFormaPago } from "@/app/actions/catalogos";
 import {
@@ -8,6 +8,8 @@ import {
   FormField,
   CatalogoDialog,
   useServerAction,
+  SearchBar,
+  EmptyState,
 } from "@/components/catalogo-table-shell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,7 +37,13 @@ export default function FormasPagoClient({ formas: initial }: { formas: FormaPag
   const [formas, setFormas] = useState(initial);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editando, setEditando] = useState<FormaPago | null>(null);
+  const [busqueda, setBusqueda] = useState("");
   const isNuevo = !editando?.id;
+
+  const filtradas = useMemo(() => {
+    const q = busqueda.toLowerCase();
+    return q ? formas.filter((f) => f.nombre.toLowerCase().includes(q) || (f.tipo ?? "").toLowerCase().includes(q)) : formas;
+  }, [formas, busqueda]);
 
   const { state, busy, run, reset } = useServerAction(upsertFormaPago, () => {
     setDialogOpen(false);
@@ -49,12 +57,15 @@ export default function FormasPagoClient({ formas: initial }: { formas: FormaPag
     else { toast.success("Forma de pago eliminada."); setFormas((p) => p.filter((f) => f.id !== id)); }
   };
 
+  const openNew = () => { reset(); setEditando(EMPTY); setDialogOpen(true); };
+
   return (
     <>
-      <div className="flex justify-end mb-4">
+      <div className="flex items-center justify-between mb-4">
+        <SearchBar value={busqueda} onChange={setBusqueda} placeholder="Buscar forma de pago..." />
         <Button
           size="sm"
-          onClick={() => { reset(); setEditando(EMPTY); setDialogOpen(true); }}
+          onClick={openNew}
           className="bg-brand-coral hover:bg-brand-coral/90 text-white h-8 text-xs"
         >
           + Nueva forma de pago
@@ -75,7 +86,7 @@ export default function FormasPagoClient({ formas: initial }: { formas: FormaPag
             </TableRow>
           </TableHeader>
           <TableBody>
-            {formas.map((f) => (
+            {filtradas.map((f) => (
               <TableRow
                 key={f.id}
                 className="hover:bg-brand-cream/30 cursor-pointer"
@@ -102,6 +113,12 @@ export default function FormasPagoClient({ formas: initial }: { formas: FormaPag
             ))}
           </TableBody>
         </Table>
+        {filtradas.length === 0 && (
+          <EmptyState
+            mensaje={busqueda ? `Sin resultados para "${busqueda}".` : "No hay formas de pago."}
+            onNew={busqueda ? undefined : openNew}
+          />
+        )}
       </div>
 
       <CatalogoDialog
@@ -122,11 +139,11 @@ export default function FormasPagoClient({ formas: initial }: { formas: FormaPag
             <FormField label="Nombre" name="nombre" defaultValue={editando.nombre} required />
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-brand-cocoa mb-1">Afecta Cash</label>
+                <label className="block text-xs font-medium text-brand-cocoa mb-1.5">Afecta Cash</label>
                 <select
                   name="afecta_cash"
                   defaultValue={editando.afecta_cash === null ? "" : String(editando.afecta_cash)}
-                  className="w-full h-8 rounded-md border border-input bg-background px-3 text-xs text-brand-cocoa focus:outline-none focus:ring-2 focus:ring-brand-coral/30"
+                  className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm text-brand-cocoa focus:outline-none focus:ring-2 focus:ring-brand-coral/30"
                 >
                   <option value="">No definido</option>
                   <option value="true">Sí</option>
@@ -134,11 +151,11 @@ export default function FormasPagoClient({ formas: initial }: { formas: FormaPag
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-brand-cocoa mb-1">Genera CXC/CXP</label>
+                <label className="block text-xs font-medium text-brand-cocoa mb-1.5">Genera CXC/CXP</label>
                 <select
                   name="genera_cxc_cxp"
                   defaultValue={String(editando.genera_cxc_cxp)}
-                  className="w-full h-8 rounded-md border border-input bg-background px-3 text-xs text-brand-cocoa focus:outline-none focus:ring-2 focus:ring-brand-coral/30"
+                  className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm text-brand-cocoa focus:outline-none focus:ring-2 focus:ring-brand-coral/30"
                 >
                   <option value="false">No</option>
                   <option value="true">Sí</option>

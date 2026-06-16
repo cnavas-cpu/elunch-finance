@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type { TipoCosto } from "@/lib/db/catalogos";
 import { upsertTipoCosto, deleteTipoCosto } from "@/app/actions/catalogos";
 import {
@@ -8,6 +8,8 @@ import {
   FormField,
   CatalogoDialog,
   useServerAction,
+  SearchBar,
+  EmptyState,
 } from "@/components/catalogo-table-shell";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,7 +23,13 @@ export default function TiposCostoClient({ tipos: initial }: { tipos: TipoCosto[
   const [tipos, setTipos] = useState(initial);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editando, setEditando] = useState<TipoCosto | null>(null);
+  const [busqueda, setBusqueda] = useState("");
   const isNuevo = !editando?.id;
+
+  const filtrados = useMemo(() => {
+    const q = busqueda.toLowerCase();
+    return q ? tipos.filter((t) => t.tag.toLowerCase().includes(q) || (t.grupo ?? "").toLowerCase().includes(q)) : tipos;
+  }, [tipos, busqueda]);
 
   const { state, busy, run, reset } = useServerAction(upsertTipoCosto, () => {
     setDialogOpen(false);
@@ -35,12 +43,15 @@ export default function TiposCostoClient({ tipos: initial }: { tipos: TipoCosto[
     else { toast.success("Tipo eliminado."); setTipos((p) => p.filter((t) => t.id !== id)); }
   };
 
+  const openNew = () => { reset(); setEditando(EMPTY); setDialogOpen(true); };
+
   return (
     <>
-      <div className="flex justify-end mb-4">
+      <div className="flex items-center justify-between mb-4">
+        <SearchBar value={busqueda} onChange={setBusqueda} placeholder="Buscar tipo..." />
         <Button
           size="sm"
-          onClick={() => { reset(); setEditando(EMPTY); setDialogOpen(true); }}
+          onClick={openNew}
           className="bg-brand-coral hover:bg-brand-coral/90 text-white h-8 text-xs"
         >
           + Nuevo tipo
@@ -59,7 +70,7 @@ export default function TiposCostoClient({ tipos: initial }: { tipos: TipoCosto[
             </TableRow>
           </TableHeader>
           <TableBody>
-            {tipos.map((t) => (
+            {filtrados.map((t) => (
               <TableRow
                 key={t.id}
                 className="hover:bg-brand-cream/30 cursor-pointer"
@@ -70,15 +81,18 @@ export default function TiposCostoClient({ tipos: initial }: { tipos: TipoCosto[
                 <TableCell className="text-xs text-text-muted">{t.grupo ?? "—"}</TableCell>
                 <TableCell className="text-xs text-text-muted">{t.descripcion ?? "—"}</TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()} className="text-right">
-                  <DeleteButton
-                    onConfirm={() => handleDelete(t.id)}
-                    label="Eliminar"
-                  />
+                  <DeleteButton onConfirm={() => handleDelete(t.id)} label="Eliminar" />
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
+        {filtrados.length === 0 && (
+          <EmptyState
+            mensaje={busqueda ? `Sin resultados para "${busqueda}".` : "No hay tipos de costo."}
+            onNew={busqueda ? undefined : openNew}
+          />
+        )}
       </div>
       <p className="text-xs text-text-muted mt-2">
         Si eliminas un tipo usado por algún proveedor, la app te avisará con un error.
