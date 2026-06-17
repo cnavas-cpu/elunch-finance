@@ -109,8 +109,12 @@ BEGIN
 END;
 $$;
 
-REVOKE ALL ON FUNCTION crear_venta FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION crear_venta TO authenticated;
+-- Eliminar la versión anterior de crear_venta (sin p_fecha_esperada) que
+-- quedó de la migración 003 y causa ambigüedad en REVOKE/GRANT.
+DROP FUNCTION IF EXISTS crear_venta(DATE, BIGINT, VARCHAR(10), VARCHAR(10), VARCHAR(10), VARCHAR(10), TEXT);
+
+REVOKE ALL ON FUNCTION crear_venta(DATE, BIGINT, VARCHAR(10), VARCHAR(10), VARCHAR(10), VARCHAR(10), TEXT, DATE) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION crear_venta(DATE, BIGINT, VARCHAR(10), VARCHAR(10), VARCHAR(10), VARCHAR(10), TEXT, DATE) TO authenticated;
 
 -- ── RPC registrar_pago_cxc ────────────────────────────────────────
 -- Registra un cobro (abono parcial o total) sobre una CXC.
@@ -199,8 +203,8 @@ BEGIN
 END;
 $$;
 
-REVOKE ALL ON FUNCTION registrar_pago_cxc FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION registrar_pago_cxc TO authenticated;
+REVOKE ALL ON FUNCTION registrar_pago_cxc(UUID, DATE, VARCHAR(10), BIGINT, TEXT) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION registrar_pago_cxc(UUID, DATE, VARCHAR(10), BIGINT, TEXT) TO authenticated;
 
 -- ── RPC cambiar_estado_cxc ────────────────────────────────────────
 -- Transiciones manuales de pipeline. Bloquea llegar a 'Pagada' por esta vía.
@@ -269,8 +273,8 @@ BEGIN
 END;
 $$;
 
-REVOKE ALL ON FUNCTION cambiar_estado_cxc FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION cambiar_estado_cxc TO authenticated;
+REVOKE ALL ON FUNCTION cambiar_estado_cxc(UUID, TEXT) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION cambiar_estado_cxc(UUID, TEXT) TO authenticated;
 
 -- ── RPC actualizar_evidencia_cxc ──────────────────────────────────
 -- Edita num_oc, num_factura y notas de una CXC. Auditado.
@@ -318,5 +322,5 @@ BEGIN
 END;
 $$;
 
-REVOKE ALL ON FUNCTION actualizar_evidencia_cxc FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION actualizar_evidencia_cxc TO authenticated;
+REVOKE ALL ON FUNCTION actualizar_evidencia_cxc(UUID, TEXT, TEXT, TEXT) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION actualizar_evidencia_cxc(UUID, TEXT, TEXT, TEXT) TO authenticated;
