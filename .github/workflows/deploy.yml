@@ -7,11 +7,13 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:
-      VERCEL_ORG_ID: team_cWnfT04zxR7EtI5Loc369u9t
-      VERCEL_PROJECT_ID: prj_deXVgajit4zSb9zyywQUGJ68JUJ5
     steps:
       - uses: actions/checkout@v4
+
+      - name: Link Vercel project
+        run: |
+          mkdir -p .vercel
+          echo '{"projectId":"prj_deXVgajit4zSb9zyywQUGJ68JUJ5","orgId":"team_cWnfT04zxR7EtI5Loc369u9t"}' > .vercel/project.json
 
       - name: Deploy to Vercel
         run: npx vercel deploy --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
