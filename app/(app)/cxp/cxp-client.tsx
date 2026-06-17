@@ -193,6 +193,7 @@ function AbonoDialog({ cxp, cuentas, hoy, onClose, onSuccess }: {
   const abonado = totalAbonado(cxp.pagos);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMonto((saldo / 100).toFixed(2));
     setTimeout(() => montoRef.current?.select(), 60);
   }, [saldo]);
@@ -477,6 +478,16 @@ function CxpRow({ cxp, hoy, onAbonar, onEstadoChange }: {
   );
 }
 
+// ── Punto de color SVG (fuera del componente para no recrearse en render) ───
+
+function DotRojo() {
+  return (
+    <svg viewBox="0 0 8 8" className="w-2 h-2 flex-shrink-0" aria-hidden="true">
+      <circle cx="4" cy="4" r="4" fill="currentColor"/>
+    </svg>
+  );
+}
+
 // ── Componente principal ──────────────────────────────────────
 
 export function CxpClient({ hoy, cxpsIniciales, cuentas }: {
@@ -530,13 +541,6 @@ export function CxpClient({ hoy, cxpsIniciales, cuentas }: {
   };
 
   const ESTADOS_FILTRO = ["todos", "Pendiente", "Programada", "En disputa", "Pagada"];
-
-  // Punto de color SVG para botón "Vencidas" (sin emoji)
-  const DotRojo = () => (
-    <svg viewBox="0 0 8 8" className="w-2 h-2 flex-shrink-0" aria-hidden="true">
-      <circle cx="4" cy="4" r="4" fill="currentColor"/>
-    </svg>
-  );
 
   return (
     <div className="min-h-full bg-background">
