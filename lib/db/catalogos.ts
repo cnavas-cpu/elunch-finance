@@ -31,6 +31,7 @@ export type ClienteCorporativo = {
   relacion: string | null;
   estado: "activo" | "inactivo" | "programado";
   notas: string | null;
+  dias_credito: number;  // Sprint 5: días de crédito por cliente (default 0 = contado)
 };
 
 export type CuentaBancaria = {
@@ -91,7 +92,7 @@ export async function getClientesCorporativos(): Promise<ClienteCorporativo[]> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from("clientes_corporativos")
-    .select("id, nombre, alias, relacion, estado, notas")
+    .select("id, nombre, alias, relacion, estado, notas, dias_credito")
     .order("nombre");
   if (error) throw error;
   return (data ?? []) as ClienteCorporativo[];

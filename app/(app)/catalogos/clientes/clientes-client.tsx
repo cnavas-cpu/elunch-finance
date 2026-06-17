@@ -19,7 +19,7 @@ import {
 import { toast } from "sonner";
 
 const EMPTY: ClienteCorporativo = {
-  id: "", nombre: "", alias: null, relacion: null, estado: "activo", notas: null,
+  id: "", nombre: "", alias: null, relacion: null, estado: "activo", notas: null, dias_credito: 0,
 };
 
 export default function ClientesClient({ clientes: initial }: { clientes: ClienteCorporativo[] }) {
@@ -113,6 +113,14 @@ export default function ClientesClient({ clientes: initial }: { clientes: Client
               <FormField label="Alias" name="alias" defaultValue={editando.alias} placeholder="Abreviación" />
               <FormField label="Relación" name="relacion" defaultValue={editando.relacion} placeholder="Tipo de contrato" />
             </div>
+            <FormField
+              label="Días de crédito"
+              name="dias_credito"
+              defaultValue={String(editando.dias_credito ?? 0)}
+              type="number"
+              placeholder="0"
+              hint="0 = contado"
+            />
             <div className="space-y-1.5">
               <Label htmlFor="notas" className="text-xs font-medium text-brand-cocoa">Notas</Label>
               <textarea id="notas" name="notas" defaultValue={editando.notas ?? ""} rows={2}

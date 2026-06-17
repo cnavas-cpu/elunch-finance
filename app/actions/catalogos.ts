@@ -45,6 +45,7 @@ const ClienteSchema = z.object({
   relacion: z.string().max(200).nullable().optional(),
   estado: z.enum(["activo", "inactivo", "programado"]),
   notas: z.string().max(500).nullable().optional(),
+  dias_credito: z.coerce.number().int().min(0).max(365),  // Sprint 5
 });
 
 const UnidadSchema = z.object({
@@ -131,7 +132,7 @@ export async function upsertCliente(
   formData: FormData
 ): Promise<ClienteState> {
   const raw = fd(formData);
-  const result = ClienteSchema.safeParse({ ...raw, estado: raw.estado ?? "activo" });
+  const result = ClienteSchema.safeParse({ ...raw, estado: raw.estado ?? "activo", dias_credito: raw.dias_credito ?? 0 });
   if (!result.success) {
     return { error: result.error.issues[0]?.message ?? "Datos inválidos." };
   }
@@ -145,6 +146,7 @@ export async function upsertCliente(
     relacion: d.relacion ?? null,
     estado: d.estado,
     notas: d.notas ?? null,
+    dias_credito: d.dias_credito,  // Sprint 5
   };
   const { error } = isNew
     ? await dbInsert(supabase, "clientes_corporativos", row)
