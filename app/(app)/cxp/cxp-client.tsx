@@ -44,7 +44,6 @@ const ESTADO_STYLE: Record<string, string> = {
   "En disputa": "bg-status-warn/15 text-[#7a5100] dark:text-brand-amber border-status-warn/30",
 };
 
-// Badge estático (solo lectura)
 function EstadoCxpBadge({ estado }: { estado: string }) {
   return (
     <span className={cn(
@@ -53,87 +52,6 @@ function EstadoCxpBadge({ estado }: { estado: string }) {
     )}>
       {estado}
     </span>
-  );
-}
-
-// Badge clickeable que abre un menú de transiciones
-function EstadoSelector({
-  estado,
-  transiciones,
-  pending,
-  onSelect,
-}: {
-  estado:      string;
-  transiciones: string[];
-  pending:     boolean;
-  onSelect:    (nuevo: string) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  // Cierra al hacer clic fuera
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [open]);
-
-  // Sin transiciones disponibles → badge estático
-  if (transiciones.length === 0) {
-    return <EstadoCxpBadge estado={estado} />;
-  }
-
-  return (
-    <div ref={ref} className="relative inline-block">
-      <button
-        onClick={() => !pending && setOpen(v => !v)}
-        disabled={pending}
-        title="Cambiar estado"
-        className={cn(
-          "flex items-center gap-1 text-xs px-1.5 py-0.5 rounded border font-medium whitespace-nowrap transition-colors duration-150 cursor-pointer",
-          ESTADO_STYLE[estado] ?? "bg-border/20 text-text-muted border-border/30",
-          "hover:brightness-95 dark:hover:brightness-110",
-          pending && "opacity-50 cursor-not-allowed"
-        )}
-      >
-        {estado}
-        {/* chevron animado */}
-        <svg
-          viewBox="0 0 10 6"
-          className={cn("w-2.5 h-2.5 opacity-60 transition-transform duration-150", open && "rotate-180")}
-          fill="none" stroke="currentColor" strokeWidth="1.5"
-        >
-          <path d="M1 1l4 4 4-4" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      </button>
-
-      {open && (
-        <div className="absolute top-full left-0 mt-1 z-20 bg-surface border border-border rounded-lg shadow-lg py-1 min-w-[130px]">
-          <p className="px-3 pt-1 pb-1.5 text-[10px] text-text-muted uppercase tracking-wide font-medium border-b border-border/50">
-            Cambiar a…
-          </p>
-          {transiciones.map(t => (
-            <button
-              key={t}
-              onClick={() => { onSelect(t); setOpen(false); }}
-              className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-left hover:bg-surface-muted transition-colors duration-100 cursor-pointer"
-            >
-              <span className={cn(
-                "w-1.5 h-1.5 rounded-full flex-shrink-0",
-                ESTADO_STYLE[t]?.includes("status-info")  ? "bg-status-info" :
-                ESTADO_STYLE[t]?.includes("status-warn")  ? "bg-status-warn" :
-                ESTADO_STYLE[t]?.includes("status-ok")    ? "bg-status-ok"   :
-                "bg-text-muted"
-              )} />
-              {t}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
   );
 }
 
@@ -518,26 +436,42 @@ function CxpRow({
         <AgingBadge fechaVenc={cxp.fecha_vencimiento} aging={aging} dias={dias} />
       </td>
 
-      {/* Estado — clickeable para cambiar */}
+      {/* Estado */}
       <td className="py-2.5 px-3">
-        <EstadoSelector
-          estado={cxp.estado}
-          transiciones={transiciones}
-          pending={changingEstado}
-          onSelect={handleEstado}
-        />
+        <EstadoCxpBadge estado={cxp.estado} />
       </td>
 
       {/* Acciones */}
-      <td className="py-2.5 px-2">
-        {cxp.estado !== "Pagada" && saldo > 0 && (
-          <button
-            onClick={() => onAbonar(cxp)}
-            className="text-xs px-2.5 py-1 rounded-md bg-brand-coral text-[#1c1712] hover:bg-brand-coral/90 transition-colors duration-150 cursor-pointer font-medium whitespace-nowrap"
-          >
-            Abonar
-          </button>
-        )}
+      <td className="py-2.5 px-3">
+        <div className="flex flex-col items-end gap-1.5">
+          {/* Abonar — siempre visible cuando hay saldo */}
+          {cxp.estado !== "Pagada" && saldo > 0 && (
+            <button
+              onClick={() => onAbonar(cxp)}
+              className="text-xs px-2.5 py-1 rounded-md bg-brand-coral text-[#1c1712] hover:bg-brand-coral/90 transition-colors duration-150 cursor-pointer font-medium whitespace-nowrap"
+            >
+              Abonar
+            </button>
+          )}
+
+          {/* Cambiar estado — select nativo, sin problemas de overflow */}
+          {transiciones.length > 0 && (
+            <select
+              value=""
+              disabled={changingEstado}
+              onChange={e => {
+                if (e.target.value) handleEstado(e.target.value);
+                (e.target as HTMLSelectElement).value = "";
+              }}
+              className="text-xs rounded-md border border-border/60 px-2 py-1 bg-surface text-text-muted hover:border-brand-cocoa/50 focus:outline-none focus:ring-1 focus:ring-brand-coral cursor-pointer disabled:opacity-50 w-full"
+            >
+              <option value="">Mover estado…</option>
+              {transiciones.map(t => (
+                <option key={t} value={t}>{t}</option>
+              ))}
+            </select>
+          )}
+        </div>
       </td>
     </tr>
   );
