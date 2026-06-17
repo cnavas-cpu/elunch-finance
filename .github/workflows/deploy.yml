@@ -1,4 +1,4 @@
-name: Deploy a Vercel Production
+name: Deploy to Vercel Production
 
 on:
   push:
@@ -7,11 +7,11 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: team_cWnfT04zxR7EtI5Loc369u9t
+      VERCEL_PROJECT_ID: prj_deXVgajit4zSb9zyywQUGJ68JUJ5
     steps:
       - uses: actions/checkout@v4
 
-      - name: Link Vercel project
-        run: npx vercel pull --yes --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Deploy to Vercel (Vercel builds in cloud)
+      - name: Deploy to Vercel
         run: npx vercel deploy --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
