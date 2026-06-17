@@ -10,13 +10,14 @@ const montoSchema = z
   .positive("El monto debe ser mayor que $0.00");
 
 export const ventaInputSchema = z.object({
-  fecha:          fechaSchema,
-  unidad_id:      z.string().min(1, "Selecciona una unidad de negocio"),
-  monto_centavos: montoSchema,
-  forma_pago_id:  z.string().min(1, "Selecciona una forma de pago"),
-  cuenta_id:      z.string().nullable().optional(),
-  cliente_id:     z.string().nullable().optional(),
-  descripcion:    z.string().max(300).nullable().optional(),
+  fecha:           fechaSchema,
+  unidad_id:       z.string().min(1, "Selecciona una unidad de negocio"),
+  monto_centavos:  montoSchema,
+  forma_pago_id:   z.string().min(1, "Selecciona una forma de pago"),
+  cuenta_id:       z.string().nullable().optional(),
+  cliente_id:      z.string().nullable().optional(),
+  descripcion:     z.string().max(300).nullable().optional(),
+  fecha_esperada:  z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(), // Sprint 5
 });
 
 export const salidaInputSchema = z.object({

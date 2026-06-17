@@ -20,7 +20,7 @@ export type FormaPagoOpc = {
 };
 
 export type CuentaOpc = { id: string; nombre: string; tipo: string };
-export type ClienteOpc = { id: string; nombre: string; alias: string | null };
+export type ClienteOpc = { id: string; nombre: string; alias: string | null; dias_credito: number }; // Sprint 5
 export type CategoriaOpc = { id: string; nombre: string };
 export type ProveedorOpc = {
   id: string;
@@ -81,7 +81,7 @@ export async function getCatalogosCierre(): Promise<CatalogosCierre> {
         .order("nombre"),
       (supabase as any)
         .from("clientes_corporativos")
-        .select("id, nombre, alias")
+        .select("id, nombre, alias, dias_credito")  // Sprint 5: dias_credito para prefill fecha_esperada
         .neq("estado", "inactivo")
         .order("nombre"),
       (supabase as any)

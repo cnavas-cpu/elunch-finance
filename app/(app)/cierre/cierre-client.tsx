@@ -106,17 +106,36 @@ function VentaForm({
   onSuccess: (tx: TransaccionDisplay) => void;
 }) {
   const [pending, startTransition] = useTransition();
-  const [unidadId, setUnidadId]     = useState("");
-  const [monto, setMonto]           = useState("");
+  const [unidadId, setUnidadId]       = useState("");
+  const [monto, setMonto]             = useState("");
   const [formaPagoId, setFormaPagoId] = useState("");
-  const [cuentaId, setCuentaId]     = useState("");
-  const [clienteId, setClienteId]   = useState("");
+  const [cuentaId, setCuentaId]       = useState("");
+  const [clienteId, setClienteId]     = useState("");
+  const [fechaEsperada, setFechaEsperada] = useState("");  // Sprint 5
   const uid = useId();
   const montoRef = useRef<HTMLInputElement>(null);
 
   const fp = catalogos.formasPago.find(f => f.id === formaPagoId);
   const mostrarCuenta  = fp?.afecta_cash === true;
   const mostrarCliente = fp?.genera_cxc_cxp === true;
+
+  // Auto-prefill fecha esperada desde días de crédito del cliente (Sprint 5)
+  useEffect(() => {
+    if (!mostrarCliente || !clienteId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setFechaEsperada("");
+      return;
+    }
+    const cliente = catalogos.clientes.find(c => c.id === clienteId);
+    if (!cliente || cliente.dias_credito <= 0) return;
+    // Calcular sin problemas UTC: parsear con hora local
+    const base = new Date(fecha + "T00:00:00");
+    base.setDate(base.getDate() + cliente.dias_credito);
+    const yyyy = base.getFullYear();
+    const mm   = String(base.getMonth() + 1).padStart(2, "0");
+    const dd   = String(base.getDate()).padStart(2, "0");
+    setFechaEsperada(`${yyyy}-${mm}-${dd}`);
+  }, [clienteId, mostrarCliente, fecha, catalogos.clientes]);
 
   // Ventas: solo formas de pago de ingreso o ambos
   const formasPagoVenta = catalogos.formasPago.filter(
@@ -134,11 +153,12 @@ function VentaForm({
     startTransition(async () => {
       const result = await registrarVentaAction({
         fecha,
-        unidad_id:      unidadId,
-        monto_centavos: montoCentavos,
-        forma_pago_id:  formaPagoId,
-        cuenta_id:      mostrarCuenta  ? cuentaId  || null : null,
-        cliente_id:     mostrarCliente ? clienteId || null : null,
+        unidad_id:       unidadId,
+        monto_centavos:  montoCentavos,
+        forma_pago_id:   formaPagoId,
+        cuenta_id:       mostrarCuenta  ? cuentaId   || null : null,
+        cliente_id:      mostrarCliente ? clienteId  || null : null,
+        fecha_esperada:  mostrarCliente ? fechaEsperada || null : null,  // Sprint 5
       });
 
       if (!result.ok) {
@@ -149,6 +169,7 @@ function VentaForm({
       toast.success("Venta registrada");
       onSuccess(result.data);
       setMonto("");
+      setFechaEsperada("");  // Sprint 5
       // Re-focus para entrada rápida
       setTimeout(() => montoRef.current?.focus(), 50);
     });
@@ -239,6 +260,19 @@ function VentaForm({
             </Select>
           </div>
         )}
+
+        {mostrarCliente && (
+          <div>
+            <Label htmlFor={`${uid}-fecha-esp`}>Fecha esperada (CXC)</Label>
+            <Input
+              id={`${uid}-fecha-esp`}
+              type="date"
+              value={fechaEsperada}
+              onChange={setFechaEsperada}
+              className="w-full"
+            />
+          </div>
+        )}
       </div>
 
       <button
@@ -283,6 +317,7 @@ function SalidaForm({
   // Auto-prefill fecha de vencimiento desde días de crédito del proveedor
   useEffect(() => {
     if (!mostrarVenc || !proveedorId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFechaVenc("");
       return;
     }

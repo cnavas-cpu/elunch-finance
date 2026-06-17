@@ -32,13 +32,14 @@ async function fetchTx(id: string): Promise<TransaccionDisplay> {
 
 // ── Registrar venta ──────────────────────────────────────────
 export async function registrarVentaAction(input: {
-  fecha:          string;
-  unidad_id:      string;
-  monto_centavos: number;
-  forma_pago_id:  string;
-  cuenta_id?:     string | null;
-  cliente_id?:    string | null;
-  descripcion?:   string | null;
+  fecha:           string;
+  unidad_id:       string;
+  monto_centavos:  number;
+  forma_pago_id:   string;
+  cuenta_id?:      string | null;
+  cliente_id?:     string | null;
+  descripcion?:    string | null;
+  fecha_esperada?: string | null;  // Sprint 5
 }): Promise<ActionResult> {
   const parsed = ventaInputSchema.safeParse(input);
   if (!parsed.success) {
@@ -50,13 +51,14 @@ export async function registrarVentaAction(input: {
   if (!user) return { ok: false, error: "No autenticado" };
 
   const { data: rpc, error: rpcErr } = await (supabase as any).rpc("crear_venta", {
-    p_fecha:          parsed.data.fecha,
-    p_monto_centavos: parsed.data.monto_centavos,
-    p_unidad_id:      parsed.data.unidad_id,
-    p_forma_pago_id:  parsed.data.forma_pago_id,
-    p_cuenta_id:      parsed.data.cuenta_id     ?? null,
-    p_cliente_id:     parsed.data.cliente_id    ?? null,
-    p_descripcion:    parsed.data.descripcion   ?? null,
+    p_fecha:           parsed.data.fecha,
+    p_monto_centavos:  parsed.data.monto_centavos,
+    p_unidad_id:       parsed.data.unidad_id,
+    p_forma_pago_id:   parsed.data.forma_pago_id,
+    p_cuenta_id:       parsed.data.cuenta_id      ?? null,
+    p_cliente_id:      parsed.data.cliente_id     ?? null,
+    p_descripcion:     parsed.data.descripcion    ?? null,
+    p_fecha_esperada:  parsed.data.fecha_esperada ?? null,  // Sprint 5
   });
 
   if (rpcErr) return { ok: false, error: rpcErr.message };
