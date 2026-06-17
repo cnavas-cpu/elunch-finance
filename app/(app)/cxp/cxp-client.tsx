@@ -5,10 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { CxpDisplay, CuentaBancariaOpc } from "@/lib/db/cxp";
-import {
-  formatUSD,
-  parseCentavos,
-} from "@/lib/finance/cierre";
+import { formatUSD, parseCentavos } from "@/lib/finance/cierre";
 import {
   calcularSaldo,
   totalAbonado,
@@ -19,11 +16,7 @@ import {
   type EstadoAging,
 } from "@/lib/finance/cxp";
 import { registrarPagoCxpAction, cambiarEstadoCxpAction } from "./actions";
-import {
-  SearchBar,
-  TableShell,
-  EmptyState,
-} from "@/components/catalogo-table-shell";
+import { SearchBar, TableShell, EmptyState } from "@/components/catalogo-table-shell";
 import {
   Dialog,
   DialogContent,
@@ -33,6 +26,47 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+
+// ── Íconos SVG inline ─────────────────────────────────────────
+
+function IconDolar({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5"
+      className={className} aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round"
+        d="M10 2v1m0 14v1M7.5 5.5A2.5 2.5 0 0110 4h.5A2 2 0 0112.5 6v.5a2 2 0 01-2 2h-1a2 2 0 00-2 2v.5A2 2 0 009.5 13H10a2.5 2.5 0 002.5-2.5"/>
+    </svg>
+  );
+}
+
+function IconAlerta({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5"
+      className={className} aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round"
+        d="M10 3L2.5 16h15L10 3zm0 5v4m0 2.5h.01"/>
+    </svg>
+  );
+}
+
+function IconReloj({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5"
+      className={className} aria-hidden="true">
+      <circle cx="10" cy="10" r="7.5"/>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M10 6.5V10l2.5 2.5"/>
+    </svg>
+  );
+}
+
+function IconCheck({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2"
+      className={className} aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l3.5 3.5L13 4"/>
+    </svg>
+  );
+}
 
 // ── Badge de estado ───────────────────────────────────────────
 
@@ -57,11 +91,7 @@ function EstadoCxpBadge({ estado }: { estado: string }) {
 
 // ── Badge de aging / semáforo ─────────────────────────────────
 
-function AgingBadge({
-  fechaVenc,
-  aging,
-  dias,
-}: {
+function AgingBadge({ fechaVenc, aging, dias }: {
   fechaVenc: string | null;
   aging:     EstadoAging;
   dias:      number;
@@ -70,7 +100,6 @@ function AgingBadge({
     return <span className="text-xs text-text-muted">Sin fecha</span>;
   }
 
-  // Formato "17 jun"
   const [, m, d] = fechaVenc.split("-");
   const meses = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
   const label = `${parseInt(d)} ${meses[parseInt(m) - 1]}`;
@@ -81,54 +110,47 @@ function AgingBadge({
                              "text-text-muted";
 
   const sublabel =
-    aging === "vencida"    ? `Venció hace ${Math.abs(dias)} días` :
-    aging === "por_vencer" ? (dias === 0 ? "Vence hoy" : `Vence en ${dias} días`) :
-                             `Faltan ${dias} días`;
+    aging === "vencida"    ? `Venció hace ${Math.abs(dias)}d` :
+    aging === "por_vencer" ? (dias === 0 ? "Vence hoy" : `Vence en ${dias}d`) :
+                             `Faltan ${dias}d`;
 
   return (
     <div>
       <p className={cn("text-xs font-medium tabular-nums", colorClass)}>{label}</p>
-      <p className={cn("text-[10px]", colorClass)}>{sublabel}</p>
+      <p className={cn("text-[11px]", colorClass)}>{sublabel}</p>
     </div>
   );
 }
 
 // ── Tarjeta de resumen ────────────────────────────────────────
 
-function ResumenCard({
-  label,
-  valor,
-  sub,
-  colorClass,
-  borderClass,
-}: {
+function ResumenCard({ label, valor, sub, colorClass, borderClass, icon }: {
   label:       string;
   valor:       number;
   sub?:        string;
   colorClass:  string;
   borderClass: string;
+  icon:        React.ReactNode;
 }) {
   return (
-    <div className={cn(
-      "bg-surface rounded-lg border p-4",
-      borderClass
-    )}>
-      <p className="text-xs text-text-muted mb-1">{label}</p>
-      <p className={cn("text-xl tabular-nums font-bold", colorClass)}>
+    <div className={cn("bg-surface rounded-lg border p-3 sm:p-4", borderClass)}>
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-xs text-text-muted leading-tight">{label}</p>
+        <span className={cn("w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0", colorClass.includes("danger") ? "bg-status-danger/10" : colorClass.includes("amber") || colorClass.includes("7a5100") ? "bg-status-warn/10" : "bg-border/20")}>
+          {icon}
+        </span>
+      </div>
+      <p className={cn("text-lg sm:text-xl tabular-nums font-bold", colorClass)}>
         {formatUSD(valor)}
       </p>
-      {sub && <p className="text-[10px] text-text-muted mt-0.5">{sub}</p>}
+      {sub && <p className="text-[11px] text-text-muted mt-0.5">{sub}</p>}
     </div>
   );
 }
 
 // ── Fila de abono (dentro del diálogo) ───────────────────────
 
-function PagoFila({
-  pago,
-}: {
-  pago: CxpDisplay["pagos"][number];
-}) {
+function PagoFila({ pago }: { pago: CxpDisplay["pagos"][number] }) {
   const [, m, d] = pago.fecha.split("-");
   const meses = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
   const fechaLabel = `${parseInt(d)} ${meses[parseInt(m) - 1]}`;
@@ -137,10 +159,10 @@ function PagoFila({
       <div>
         <p className="text-xs font-medium text-foreground">{fechaLabel}</p>
         {pago.cuentas_bancarias && (
-          <p className="text-[10px] text-text-muted">{pago.cuentas_bancarias.nombre}</p>
+          <p className="text-[11px] text-text-muted">{pago.cuentas_bancarias.nombre}</p>
         )}
         {pago.notas && (
-          <p className="text-[10px] text-text-muted italic">{pago.notas}</p>
+          <p className="text-[11px] text-text-muted italic">{pago.notas}</p>
         )}
       </div>
       <span className="text-sm tabular-nums font-semibold text-status-ok">
@@ -152,34 +174,26 @@ function PagoFila({
 
 // ── Diálogo de abono ──────────────────────────────────────────
 
-function AbonoDialog({
-  cxp,
-  cuentas,
-  hoy,
-  onClose,
-  onSuccess,
-}: {
-  cxp:      CxpDisplay;
-  cuentas:  CuentaBancariaOpc[];
-  hoy:      string;
-  onClose:  () => void;
+function AbonoDialog({ cxp, cuentas, hoy, onClose, onSuccess }: {
+  cxp:       CxpDisplay;
+  cuentas:   CuentaBancariaOpc[];
+  hoy:       string;
+  onClose:   () => void;
   onSuccess: (cxpId: string, estado: string, nuevoAbono: { id: string; monto_centavos: number }) => void;
 }) {
   const [pending, startTransition] = useTransition();
-  const [monto, setMonto]         = useState("");
-  const [cuentaId, setCuentaId]   = useState("");
-  const [fecha, setFecha]         = useState(hoy);
-  const [notas, setNotas]         = useState("");
-  const [error, setError]         = useState<string | null>(null);
+  const [monto, setMonto]       = useState("");
+  const [cuentaId, setCuentaId] = useState("");
+  const [fecha, setFecha]       = useState(hoy);
+  const [notas, setNotas]       = useState("");
+  const [error, setError]       = useState<string | null>(null);
   const montoRef = useRef<HTMLInputElement>(null);
 
-  const saldo = calcularSaldo(cxp.monto_centavos, cxp.pagos);
+  const saldo   = calcularSaldo(cxp.monto_centavos, cxp.pagos);
   const abonado = totalAbonado(cxp.pagos);
 
-  // Prefill monto con saldo
   useEffect(() => {
-    const saldoDollars = (saldo / 100).toFixed(2);
-    setMonto(saldoDollars);
+    setMonto((saldo / 100).toFixed(2));
     setTimeout(() => montoRef.current?.select(), 60);
   }, [saldo]);
 
@@ -187,35 +201,24 @@ function AbonoDialog({
     e.preventDefault();
     setError(null);
     const montoCentavos = parseCentavos(monto);
-    if (montoCentavos <= 0) {
-      setError("El monto debe ser mayor que $0.00");
-      return;
-    }
-    if (!cuentaId) {
-      setError("Selecciona una cuenta bancaria");
-      return;
-    }
+    if (montoCentavos <= 0) { setError("El monto debe ser mayor que $0.00"); return; }
+    if (!cuentaId)           { setError("Selecciona una cuenta bancaria");   return; }
+
     startTransition(async () => {
       const result = await registrarPagoCxpAction({
-        cxp_id:         cxp.id,
-        fecha,
-        cuenta_id:      cuentaId,
-        monto_centavos: montoCentavos,
-        notas:          notas || null,
+        cxp_id: cxp.id, fecha, cuenta_id: cuentaId,
+        monto_centavos: montoCentavos, notas: notas || null,
       });
-      if (!result.ok) {
-        setError(result.error);
-        return;
-      }
+      if (!result.ok) { setError(result.error); return; }
       toast.success("Abono registrado");
-      // Extraer resultado del RPC para actualizar estado local
       const rpcData = result.data as { estado: string; pago_id: string } | undefined;
       onSuccess(cxp.id, rpcData?.estado ?? cxp.estado, {
-        id:              rpcData?.pago_id ?? "",
-        monto_centavos: montoCentavos,
+        id: rpcData?.pago_id ?? "", monto_centavos: montoCentavos,
       });
     });
   };
+
+  const inputCls = "h-10 w-full px-3 text-sm rounded-md border border-border bg-surface text-foreground placeholder:text-text-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-coral transition-shadow duration-150";
 
   return (
     <Dialog open onOpenChange={(v) => !v && onClose()}>
@@ -227,24 +230,30 @@ function AbonoDialog({
         </DialogHeader>
 
         {/* Info de la CXP */}
-        <div className="bg-surface-muted rounded-md px-3 py-2.5 text-sm space-y-1">
+        <div className="bg-surface-muted rounded-lg px-3 py-2.5 text-sm space-y-1">
           <p className="font-medium text-foreground">{cxp.proveedores?.nombre ?? "—"}</p>
           {cxp.transacciones?.descripcion && (
             <p className="text-xs text-text-muted">{cxp.transacciones.descripcion}</p>
           )}
-          <div className="flex gap-4 text-xs pt-0.5">
-            <span className="text-text-muted">Total: <span className="font-medium text-foreground tabular-nums">{formatUSD(cxp.monto_centavos)}</span></span>
+          <div className="flex flex-wrap gap-3 text-xs pt-0.5">
+            <span className="text-text-muted">
+              Total: <span className="font-semibold text-foreground tabular-nums">{formatUSD(cxp.monto_centavos)}</span>
+            </span>
             {abonado > 0 && (
-              <span className="text-text-muted">Abonado: <span className="font-medium text-status-ok tabular-nums">{formatUSD(abonado)}</span></span>
+              <span className="text-text-muted">
+                Abonado: <span className="font-semibold text-status-ok tabular-nums">{formatUSD(abonado)}</span>
+              </span>
             )}
-            <span className="text-text-muted">Saldo: <span className="font-medium text-status-danger tabular-nums">{formatUSD(saldo)}</span></span>
+            <span className="text-text-muted">
+              Saldo: <span className="font-semibold text-status-danger tabular-nums">{formatUSD(saldo)}</span>
+            </span>
           </div>
         </div>
 
         {/* Abonos previos */}
         {cxp.pagos.length > 0 && (
           <div className="max-h-28 overflow-y-auto border border-border/40 rounded-md px-3 py-1">
-            <p className="text-[10px] text-text-muted uppercase tracking-wide py-1">
+            <p className="text-[11px] text-text-muted uppercase tracking-wide py-1 font-medium">
               Abonos previos
             </p>
             {cxp.pagos.map(p => <PagoFila key={p.id} pago={p} />)}
@@ -255,7 +264,7 @@ function AbonoDialog({
         <form onSubmit={handleSubmit} className="space-y-3 pt-1">
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="text-xs font-medium text-brand-cocoa block mb-1">
+              <label className="text-xs font-medium text-brand-cocoa block mb-1.5">
                 Fecha <span className="text-status-danger">*</span>
               </label>
               <input
@@ -264,11 +273,11 @@ function AbonoDialog({
                 onChange={e => setFecha(e.target.value)}
                 max={hoy}
                 required
-                className="h-9 w-full px-2 text-sm rounded-md border border-border bg-surface text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-coral"
+                className={inputCls}
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-brand-cocoa block mb-1">
+              <label className="text-xs font-medium text-brand-cocoa block mb-1.5">
                 Monto (USD) <span className="text-status-danger">*</span>
               </label>
               <input
@@ -279,42 +288,42 @@ function AbonoDialog({
                 step="0.01"
                 min="0.01"
                 required
-                className="h-9 w-full px-3 text-sm rounded-md border border-border bg-surface text-foreground tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-coral"
+                className={cn(inputCls, "tabular-nums")}
               />
             </div>
           </div>
 
           <div>
-            <label className="text-xs font-medium text-brand-cocoa block mb-1">
+            <label className="text-xs font-medium text-brand-cocoa block mb-1.5">
               Cuenta bancaria <span className="text-status-danger">*</span>
             </label>
             <select
               value={cuentaId}
               onChange={e => setCuentaId(e.target.value)}
               required
-              className="h-9 w-full px-2 text-sm rounded-md border border-border bg-surface text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-coral"
+              className={cn(inputCls, "cursor-pointer")}
             >
               <option value="">Seleccionar...</option>
-              {cuentas.map(c => (
-                <option key={c.id} value={c.id}>{c.nombre}</option>
-              ))}
+              {cuentas.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
             </select>
           </div>
 
           <div>
-            <label className="text-xs font-medium text-brand-cocoa block mb-1">Notas (opcional)</label>
+            <label className="text-xs font-medium text-brand-cocoa block mb-1.5">
+              Notas <span className="text-text-muted font-normal">(opcional)</span>
+            </label>
             <input
               type="text"
               value={notas}
               onChange={e => setNotas(e.target.value)}
               maxLength={300}
               placeholder="Ej: cheque #1234, transferencia BAC..."
-              className="h-9 w-full px-3 text-sm rounded-md border border-border bg-surface text-foreground placeholder:text-text-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-coral"
+              className={inputCls}
             />
           </div>
 
           {error && (
-            <p role="alert" className="text-xs text-status-danger bg-status-danger/5 border border-status-danger/20 rounded px-3 py-2">
+            <p role="alert" className="text-xs text-status-danger bg-status-danger/5 border border-status-danger/20 rounded-md px-3 py-2">
               {error}
             </p>
           )}
@@ -322,7 +331,7 @@ function AbonoDialog({
           <DialogFooter className="pt-1 gap-2">
             <DialogClose
               disabled={pending}
-              className="inline-flex items-center justify-center rounded-md border border-border px-3 py-1.5 text-sm font-medium text-brand-cocoa bg-surface hover:bg-brand-cream/60 dark:hover:bg-white/10 transition-colors duration-150 disabled:opacity-50 cursor-pointer"
+              className="inline-flex items-center justify-center rounded-md border border-border px-4 py-2 text-sm font-medium text-brand-cocoa bg-surface hover:bg-brand-cream/60 dark:hover:bg-white/10 transition-colors duration-150 disabled:opacity-50 cursor-pointer"
             >
               Cancelar
             </DialogClose>
@@ -330,9 +339,9 @@ function AbonoDialog({
               type="submit"
               size="sm"
               disabled={pending}
-              className="bg-brand-coral hover:bg-brand-coral/90 text-[#1c1712] disabled:opacity-60 transition-colors duration-150 cursor-pointer"
+              className="bg-brand-coral hover:bg-brand-coral/90 text-[#1c1712] disabled:opacity-60 transition-colors duration-150 cursor-pointer px-4 py-2"
             >
-              {pending ? "Registrando..." : "Registrar abono"}
+              {pending ? "Registrando…" : "Registrar abono"}
             </Button>
           </DialogFooter>
         </form>
@@ -343,54 +352,41 @@ function AbonoDialog({
 
 // ── Fila de tabla ─────────────────────────────────────────────
 
-function CxpRow({
-  cxp,
-  hoy,
-  onAbonar,
-  onEstadoChange,
-}: {
+function CxpRow({ cxp, hoy, onAbonar, onEstadoChange }: {
   cxp:            CxpDisplay;
   hoy:            string;
   onAbonar:       (cxp: CxpDisplay) => void;
   onEstadoChange: (cxpId: string, nuevoEstado: string) => void;
 }) {
   const [changingEstado, startEstadoTransition] = useTransition();
-  const saldo   = calcularSaldo(cxp.monto_centavos, cxp.pagos);
-  const abonado = totalAbonado(cxp.pagos);
-  const aging   = estadoAging(cxp.fecha_vencimiento, cxp.estado as EstadoCxp, hoy);
-  const dias    = cxp.fecha_vencimiento
-    ? Math.ceil(
-        (new Date(cxp.fecha_vencimiento).getTime() - new Date(hoy).getTime()) /
-        (1000 * 60 * 60 * 24)
-      )
+  const saldo       = calcularSaldo(cxp.monto_centavos, cxp.pagos);
+  const abonado     = totalAbonado(cxp.pagos);
+  const aging       = estadoAging(cxp.fecha_vencimiento, cxp.estado as EstadoCxp, hoy);
+  const dias        = cxp.fecha_vencimiento
+    ? Math.ceil((new Date(cxp.fecha_vencimiento).getTime() - new Date(hoy).getTime()) / 86400000)
     : Infinity;
   const transiciones = transicionesDisponibles(cxp.estado as EstadoCxp);
 
   const handleEstado = useCallback((nuevo: string) => {
     startEstadoTransition(async () => {
       const result = await cambiarEstadoCxpAction({
-        cxp_id:        cxp.id,
-        nuevo_estado:  nuevo,
-        estado_actual: cxp.estado,
+        cxp_id: cxp.id, nuevo_estado: nuevo, estado_actual: cxp.estado,
       });
-      if (!result.ok) {
-        toast.error(result.error);
-        return;
-      }
+      if (!result.ok) { toast.error(result.error); return; }
       toast.success(`Estado: ${nuevo}`);
       onEstadoChange(cxp.id, nuevo);
     });
   }, [cxp.id, cxp.estado, onEstadoChange]);
 
   const rowBg =
-    aging === "vencida"    ? "bg-status-danger/5 hover:bg-status-danger/8" :
-    aging === "por_vencer" ? "bg-status-warn/5 hover:bg-status-warn/8" :
-                             "hover:bg-surface-muted/40";
+    aging === "vencida"    ? "bg-status-danger/[0.04] hover:bg-status-danger/[0.07]" :
+    aging === "por_vencer" ? "bg-status-warn/[0.04] hover:bg-status-warn/[0.07]" :
+                             "hover:bg-surface-muted/50";
 
   return (
-    <tr className={cn("border-b border-border/40 transition-colors duration-100", rowBg)}>
+    <tr className={cn("border-b border-border/40 transition-colors duration-150", rowBg)}>
       {/* Proveedor */}
-      <td className="py-2.5 px-3 text-sm">
+      <td className="py-3 px-3 text-sm">
         <p className="font-medium text-foreground leading-tight">
           {cxp.proveedores?.nombre ?? "—"}
         </p>
@@ -400,7 +396,7 @@ function CxpRow({
           </p>
         )}
         {cxp.transacciones?.fecha && (
-          <p className="text-[10px] text-text-muted">
+          <p className="text-[11px] text-text-muted/70 mt-0.5">
             {(() => {
               const [,m,d] = cxp.transacciones!.fecha.split("-");
               const ms = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
@@ -410,62 +406,66 @@ function CxpRow({
         )}
       </td>
 
-      {/* Monto total */}
-      <td className="py-2.5 px-3 text-sm text-right tabular-nums font-medium text-foreground hidden sm:table-cell">
+      {/* Monto */}
+      <td className="py-3 px-3 text-sm text-right tabular-nums font-medium text-foreground hidden sm:table-cell">
         {formatUSD(cxp.monto_centavos)}
       </td>
 
       {/* Abonado */}
-      <td className="py-2.5 px-3 text-sm text-right tabular-nums hidden md:table-cell">
+      <td className="py-3 px-3 text-sm text-right tabular-nums hidden md:table-cell">
         {abonado > 0
           ? <span className="text-status-ok">{formatUSD(abonado)}</span>
-          : <span className="text-text-muted">—</span>
+          : <span className="text-text-muted/50">—</span>
         }
       </td>
 
       {/* Saldo */}
-      <td className="py-2.5 px-3 text-sm text-right tabular-nums font-semibold">
+      <td className="py-3 px-3 text-sm text-right tabular-nums font-semibold">
         {cxp.estado === "Pagada"
-          ? <span className="text-status-ok text-xs font-medium">Pagado ✓</span>
+          ? (
+            <span className="inline-flex items-center gap-1 text-status-ok text-xs font-medium">
+              <IconCheck className="w-3 h-3" />
+              Pagada
+            </span>
+          )
           : <span className="text-status-danger">{formatUSD(saldo)}</span>
         }
       </td>
 
       {/* Vencimiento */}
-      <td className="py-2.5 px-3 hidden lg:table-cell">
+      <td className="py-3 px-3 hidden lg:table-cell">
         <AgingBadge fechaVenc={cxp.fecha_vencimiento} aging={aging} dias={dias} />
       </td>
 
       {/* Estado */}
-      <td className="py-2.5 px-3">
+      <td className="py-3 px-3">
         <EstadoCxpBadge estado={cxp.estado} />
       </td>
 
       {/* Acciones */}
-      <td className="py-2.5 px-3">
-        <div className="flex flex-col items-end gap-1.5">
-          {/* Abonar — siempre visible cuando hay saldo */}
+      <td className="py-3 px-3">
+        <div className="flex flex-col items-end gap-2">
           {cxp.estado !== "Pagada" && saldo > 0 && (
             <button
               onClick={() => onAbonar(cxp)}
-              className="text-xs px-2.5 py-1 rounded-md bg-brand-coral text-[#1c1712] hover:bg-brand-coral/90 transition-colors duration-150 cursor-pointer font-medium whitespace-nowrap"
+              className="min-h-[34px] text-xs px-3 py-1.5 rounded-md bg-brand-coral text-[#1c1712] hover:bg-brand-coral/90 active:scale-[0.97] transition-all duration-150 cursor-pointer font-semibold whitespace-nowrap"
             >
               Abonar
             </button>
           )}
 
-          {/* Cambiar estado — select nativo, sin problemas de overflow */}
           {transiciones.length > 0 && (
             <select
               value=""
               disabled={changingEstado}
+              aria-label="Cambiar estado de esta cuenta por pagar"
               onChange={e => {
                 if (e.target.value) handleEstado(e.target.value);
                 (e.target as HTMLSelectElement).value = "";
               }}
-              className="text-xs rounded-md border border-border/60 px-2 py-1 bg-surface text-text-muted hover:border-brand-cocoa/50 focus:outline-none focus:ring-1 focus:ring-brand-coral cursor-pointer disabled:opacity-50 w-full"
+              className="text-xs rounded-md border border-border/60 px-2 py-1.5 bg-surface text-text-muted hover:border-brand-cocoa/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-coral cursor-pointer disabled:opacity-40 w-full transition-colors duration-150"
             >
-              <option value="">Mover estado…</option>
+              <option value="">{changingEstado ? "Cambiando…" : "Mover estado…"}</option>
               {transiciones.map(t => (
                 <option key={t} value={t}>{t}</option>
               ))}
@@ -479,11 +479,7 @@ function CxpRow({
 
 // ── Componente principal ──────────────────────────────────────
 
-export function CxpClient({
-  hoy,
-  cxpsIniciales,
-  cuentas,
-}: {
+export function CxpClient({ hoy, cxpsIniciales, cuentas }: {
   hoy:           string;
   cxpsIniciales: CxpDisplay[];
   cuentas:       CuentaBancariaOpc[];
@@ -491,13 +487,12 @@ export function CxpClient({
   const router = useRouter();
   const [, startRefreshTransition] = useTransition();
 
-  const [cxps, setCxps] = useState<CxpDisplay[]>(cxpsIniciales);
+  const [cxps, setCxps]                 = useState<CxpDisplay[]>(cxpsIniciales);
   const [search, setSearch]             = useState("");
   const [filtroEstado, setFiltroEstado] = useState<string>("todos");
   const [soloVencidas, setSoloVencidas] = useState(false);
   const [dialogAbonar, setDialogAbonar] = useState<CxpDisplay | null>(null);
 
-  // Resumen (memoizado)
   const resumen = useMemo(() => resumenCxp(
     cxps.map(c => ({
       monto_centavos:    c.monto_centavos,
@@ -508,62 +503,40 @@ export function CxpClient({
     hoy
   ), [cxps, hoy]);
 
-  // Filtros
-  const cxpsFiltradas = useMemo(() => {
-    return cxps.filter(cxp => {
-      // Búsqueda por proveedor o descripción
-      if (search) {
-        const q = search.toLowerCase();
-        const matchProv = cxp.proveedores?.nombre?.toLowerCase().includes(q);
-        const matchDesc = cxp.transacciones?.descripcion?.toLowerCase().includes(q);
-        if (!matchProv && !matchDesc) return false;
-      }
-      // Filtro por estado
-      if (filtroEstado !== "todos" && cxp.estado !== filtroEstado) return false;
-      // Solo vencidas
-      if (soloVencidas) {
-        const aging = estadoAging(cxp.fecha_vencimiento, cxp.estado as EstadoCxp, hoy);
-        if (aging !== "vencida") return false;
-      }
-      return true;
-    });
-  }, [cxps, search, filtroEstado, soloVencidas, hoy]);
+  const cxpsFiltradas = useMemo(() => cxps.filter(cxp => {
+    if (search) {
+      const q = search.toLowerCase();
+      if (!cxp.proveedores?.nombre?.toLowerCase().includes(q) &&
+          !cxp.transacciones?.descripcion?.toLowerCase().includes(q)) return false;
+    }
+    if (filtroEstado !== "todos" && cxp.estado !== filtroEstado) return false;
+    if (soloVencidas && estadoAging(cxp.fecha_vencimiento, cxp.estado as EstadoCxp, hoy) !== "vencida") return false;
+    return true;
+  }), [cxps, search, filtroEstado, soloVencidas, hoy]);
 
-  // Actualiza el estado local tras un abono exitoso
-  const handleAbonoSuccess = (
-    cxpId: string,
-    nuevoEstado: string,
-    abono: { id: string; monto_centavos: number }
-  ) => {
-    setCxps(prev => prev.map(c => {
-      if (c.id !== cxpId) return c;
-      return {
-        ...c,
-        estado: nuevoEstado,
-        pagos:  [...c.pagos, {
-          id:               abono.id,
-          fecha:            hoy,
-          monto_centavos:   abono.monto_centavos,
-          cuenta_id:        null,
-          notas:            null,
-          cuentas_bancarias: null,
-        }],
-      };
+  const handleAbonoSuccess = (cxpId: string, nuevoEstado: string, abono: { id: string; monto_centavos: number }) => {
+    setCxps(prev => prev.map(c => c.id !== cxpId ? c : {
+      ...c,
+      estado: nuevoEstado,
+      pagos: [...c.pagos, { id: abono.id, fecha: hoy, monto_centavos: abono.monto_centavos, cuenta_id: null, notas: null, cuentas_bancarias: null }],
     }));
     setDialogAbonar(null);
-    // Refresh silencioso en background para sincronizar datos reales
     startRefreshTransition(() => router.refresh());
   };
 
-  // Actualiza estado local tras un cambio de estado
   const handleEstadoChange = (cxpId: string, nuevoEstado: string) => {
-    setCxps(prev => prev.map(c =>
-      c.id === cxpId ? { ...c, estado: nuevoEstado } : c
-    ));
+    setCxps(prev => prev.map(c => c.id === cxpId ? { ...c, estado: nuevoEstado } : c));
     startRefreshTransition(() => router.refresh());
   };
 
   const ESTADOS_FILTRO = ["todos", "Pendiente", "Programada", "En disputa", "Pagada"];
+
+  // Punto de color SVG para botón "Vencidas" (sin emoji)
+  const DotRojo = () => (
+    <svg viewBox="0 0 8 8" className="w-2 h-2 flex-shrink-0" aria-hidden="true">
+      <circle cx="4" cy="4" r="4" fill="currentColor"/>
+    </svg>
+  );
 
   return (
     <div className="min-h-full bg-background">
@@ -588,68 +561,74 @@ export function CxpClient({
       </div>
 
       <div className="px-4 sm:px-6 py-5 space-y-5">
-        {/* Tarjetas resumen */}
-        <div className="grid grid-cols-3 gap-3">
+        {/* Tarjetas resumen — 1 col en mobile, 3 en sm+ */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <ResumenCard
             label="Total por pagar"
             valor={resumen.totalPorPagar}
             sub={`${cxps.filter(c => c.estado !== "Pagada").length} facturas vivas`}
             colorClass="text-foreground"
             borderClass="border-border"
+            icon={<IconDolar className="w-4 h-4 text-text-muted" />}
           />
           <ResumenCard
             label="Vencido"
             valor={resumen.totalVencido}
-            sub={resumen.countVencidas > 0 ? `${resumen.countVencidas} factura${resumen.countVencidas > 1 ? "s" : ""}` : "Ninguna"}
+            sub={resumen.countVencidas > 0
+              ? `${resumen.countVencidas} factura${resumen.countVencidas > 1 ? "s" : ""}`
+              : "Sin vencidas"}
             colorClass={resumen.totalVencido > 0 ? "text-status-danger" : "text-text-muted"}
             borderClass={resumen.totalVencido > 0 ? "border-status-danger/30" : "border-border"}
+            icon={<IconAlerta className="w-4 h-4 text-status-danger" />}
           />
           <ResumenCard
             label="Vence ≤ 3 días"
             valor={resumen.totalPorVencer}
-            sub={resumen.countPorVencer > 0 ? `${resumen.countPorVencer} factura${resumen.countPorVencer > 1 ? "s" : ""}` : "Ninguna"}
+            sub={resumen.countPorVencer > 0
+              ? `${resumen.countPorVencer} factura${resumen.countPorVencer > 1 ? "s" : ""}`
+              : "Sin urgentes"}
             colorClass={resumen.totalPorVencer > 0 ? "text-[#7a5100] dark:text-brand-amber" : "text-text-muted"}
             borderClass={resumen.totalPorVencer > 0 ? "border-brand-amber/40" : "border-border"}
+            icon={<IconReloj className="w-4 h-4 text-[#7a5100] dark:text-brand-amber" />}
           />
         </div>
 
         {/* Filtros */}
         <div className="flex flex-wrap items-center gap-2">
-          <SearchBar
-            value={search}
-            onChange={setSearch}
-            placeholder="Buscar proveedor..."
-          />
+          <SearchBar value={search} onChange={setSearch} placeholder="Buscar proveedor..." />
+
           {ESTADOS_FILTRO.map(e => (
             <button
               key={e}
               onClick={() => { setFiltroEstado(e); setSoloVencidas(false); }}
               className={cn(
-                "h-8 px-3 text-xs rounded-full border transition-colors duration-150 cursor-pointer",
+                "h-8 px-3 text-xs rounded-full border transition-colors duration-150 cursor-pointer whitespace-nowrap",
                 filtroEstado === e && !soloVencidas
                   ? "bg-brand-cocoa text-[#fff6e2] border-brand-cocoa"
-                  : "bg-surface border-border text-text-muted hover:border-brand-cocoa/30"
+                  : "bg-surface border-border text-text-muted hover:border-brand-cocoa/30 hover:text-foreground"
               )}
             >
               {e === "todos" ? "Todas" : e}
               {e !== "todos" && resumen.countPorEstado[e as EstadoCxp] > 0 && (
-                <span className="ml-1.5 opacity-60">
+                <span className="ml-1.5 opacity-60 tabular-nums">
                   {resumen.countPorEstado[e as EstadoCxp]}
                 </span>
               )}
             </button>
           ))}
+
           {resumen.countVencidas > 0 && (
             <button
               onClick={() => { setSoloVencidas(v => !v); setFiltroEstado("todos"); }}
               className={cn(
-                "h-8 px-3 text-xs rounded-full border transition-colors duration-150 cursor-pointer",
+                "h-8 px-3 text-xs rounded-full border transition-colors duration-150 cursor-pointer flex items-center gap-1.5 whitespace-nowrap",
                 soloVencidas
                   ? "bg-status-danger text-white border-status-danger"
                   : "border-status-danger/40 text-status-danger hover:bg-status-danger/10"
               )}
             >
-              🔴 Vencidas ({resumen.countVencidas})
+              <DotRojo />
+              Vencidas ({resumen.countVencidas})
             </button>
           )}
         </div>
@@ -658,13 +637,11 @@ export function CxpClient({
         <TableShell
           empty={
             cxpsFiltradas.length === 0
-              ? <EmptyState
-                  mensaje={
+              ? <EmptyState mensaje={
                     cxps.length === 0
                       ? "No hay cuentas por pagar. Se generan automáticamente al registrar compras a crédito en el Cierre Diario."
-                      : "Ninguna CXP coincide con los filtros."
-                  }
-                />
+                      : "Ninguna CXP coincide con los filtros seleccionados."
+                  } />
               : undefined
           }
         >
@@ -672,13 +649,13 @@ export function CxpClient({
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-surface-muted border-b border-border text-xs text-text-muted">
-                  <th className="py-2 px-3 text-left font-medium">Proveedor / Compra</th>
-                  <th className="py-2 px-3 text-right font-medium hidden sm:table-cell">Monto</th>
-                  <th className="py-2 px-3 text-right font-medium hidden md:table-cell">Abonado</th>
-                  <th className="py-2 px-3 text-right font-medium">Saldo</th>
-                  <th className="py-2 px-3 text-left font-medium hidden lg:table-cell">Vencimiento</th>
-                  <th className="py-2 px-3 text-left font-medium">Estado</th>
-                  <th className="py-2 px-2 text-right font-medium w-36">Acciones</th>
+                  <th className="py-2.5 px-3 text-left font-medium">Proveedor / Compra</th>
+                  <th className="py-2.5 px-3 text-right font-medium hidden sm:table-cell">Monto</th>
+                  <th className="py-2.5 px-3 text-right font-medium hidden md:table-cell">Abonado</th>
+                  <th className="py-2.5 px-3 text-right font-medium">Saldo</th>
+                  <th className="py-2.5 px-3 text-left font-medium hidden lg:table-cell">Vencimiento</th>
+                  <th className="py-2.5 px-3 text-left font-medium">Estado</th>
+                  <th className="py-2.5 px-3 text-right font-medium w-36">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -692,11 +669,10 @@ export function CxpClient({
                   />
                 ))}
               </tbody>
-              {/* Pie: totales de la vista filtrada */}
               {cxpsFiltradas.length > 1 && (
                 <tfoot>
                   <tr className="bg-surface-muted border-t border-border">
-                    <td className="py-2 px-3 text-xs font-medium text-text-muted" colSpan={3}>
+                    <td className="py-2 px-3 text-xs text-text-muted" colSpan={3}>
                       {cxpsFiltradas.length} facturas
                     </td>
                     <td className="py-2 px-3 text-right text-sm font-semibold tabular-nums text-status-danger" colSpan={4}>
@@ -713,7 +689,6 @@ export function CxpClient({
         </TableShell>
       </div>
 
-      {/* Diálogo de abono */}
       {dialogAbonar && (
         <AbonoDialog
           cxp={dialogAbonar}
