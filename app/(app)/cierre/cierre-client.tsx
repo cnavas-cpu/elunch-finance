@@ -247,6 +247,9 @@ function VentaForm({
         {mostrarCliente && (
           <div>
             <Label htmlFor={`${uid}-cliente`}>Cliente (CXC)</Label>
+            <p className="text-[11px] text-text-muted -mt-0.5 mb-1">
+              Esta venta no entra a caja — se registra como Cuenta por Cobrar hasta que el cliente pague.
+            </p>
             <Select
               id={`${uid}-cliente`}
               value={clienteId}
@@ -470,6 +473,9 @@ function SalidaForm({
         {mostrarVenc && (
           <div>
             <Label htmlFor={`${uid}-venc`}>Vence (CXP)</Label>
+            <p className="text-[11px] text-text-muted -mt-0.5 mb-1">
+              Esta compra no sale de caja — se registra como Cuenta por Pagar hasta que pagues al proveedor.
+            </p>
             <Input
               id={`${uid}-venc`}
               type="date"
@@ -491,13 +497,25 @@ function SalidaForm({
               type="button"
               onClick={() => setAsignacion(a)}
               className={cn(
-                "flex-1 h-8 text-xs rounded-md border transition-colors duration-150 cursor-pointer",
+                "flex-1 py-1.5 px-2 text-xs rounded-md border transition-colors duration-150 cursor-pointer",
                 asignacion === a
                   ? "bg-brand-coral text-[#1c1712] border-brand-coral"
                   : "bg-surface border-border text-text-muted hover:border-brand-cocoa/40"
               )}
             >
-              {a === "pool" ? "Pool común" : "Directa a unidad"}
+              <>
+                <span className="block text-xs font-medium leading-tight">
+                  {a === "pool" ? "Pool común" : "Directa a unidad"}
+                </span>
+                <span className={cn(
+                  "block text-[10px] leading-tight mt-0.5",
+                  asignacion === a ? "opacity-70" : "text-text-muted/70"
+                )}>
+                  {a === "pool"
+                    ? "Gasto compartido entre todas las unidades"
+                    : "Solo para una cafetería específica"}
+                </span>
+              </>
             </button>
           ))}
         </div>
@@ -693,7 +711,9 @@ function ResumenPanel({
         <div className="flex justify-between items-center py-1.5 mt-1 bg-surface-muted rounded-md px-2">
           <div>
             <p className="text-xs font-semibold text-brand-cocoa">DIFF</p>
-            <p className="text-[10px] text-text-muted">Cash + CXC − CXP</p>
+            <p className="text-[10px] text-text-muted leading-tight">
+              Cash cobrado + lo que te deben (CXC) − lo que debes (CXP)
+            </p>
           </div>
           <span className={cn(
             "text-base tabular-nums font-bold",
