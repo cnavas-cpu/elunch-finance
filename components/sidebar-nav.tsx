@@ -3,13 +3,17 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const NAV_ITEMS = [
-  { href: "/",          label: "Dashboard",       icon: <DashboardIcon /> },
-  { href: "/cierre",    label: "Cierre Diario",   icon: <CierreIcon /> },
-  { href: "/cxp",       label: "Cuentas x Pagar", icon: <CxpIcon /> },
-  { href: "/cxc",       label: "Cuentas x Cobrar",icon: <CxcIcon /> },
-  { href: "/reportes",  label: "Reportes P&L",    icon: <ReportesIcon /> },
-  { href: "/catalogos", label: "Catálogos",        icon: <CatalogosIcon /> },
+type NavItem =
+  | { href: string; label: string; icon: React.ReactNode; pronto?: never }
+  | { href?: never; label: string; icon: React.ReactNode; pronto: true };
+
+const NAV_ITEMS: NavItem[] = [
+  { href: "/",          label: "Dashboard",           icon: <DashboardIcon /> },
+  { href: "/cierre",    label: "Cierre Diario",        icon: <CierreIcon /> },
+  { href: "/cxp",       label: "Cuentas por Pagar",    icon: <CxpIcon /> },
+  { href: "/cxc",       label: "Cuentas por Cobrar",   icon: <CxcIcon /> },
+  { label: "Reportes P&L", icon: <ReportesIcon />, pronto: true },
+  { href: "/catalogos", label: "Catálogos",             icon: <CatalogosIcon /> },
 ];
 
 export function SidebarNav() {
@@ -20,12 +24,29 @@ export function SidebarNav() {
 
   return (
     <nav className="flex-1 px-3 py-4 space-y-0.5" aria-label="Menú principal">
-      {NAV_ITEMS.map(({ href, label, icon }) => {
-        const active = isActive(href);
+      {NAV_ITEMS.map((item) => {
+        if (item.pronto) {
+          return (
+            <div
+              key={item.label}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-brand-cream/30 cursor-not-allowed select-none"
+              aria-hidden="true"
+              title="Disponible en la próxima versión"
+            >
+              <span className="shrink-0 w-4 h-4 text-brand-cream/20">{item.icon}</span>
+              <span>{item.label}</span>
+              <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded-full bg-white/10 text-brand-cream/40 font-medium leading-none">
+                Pronto
+              </span>
+            </div>
+          );
+        }
+
+        const active = isActive(item.href);
         return (
           <Link
-            key={href}
-            href={href}
+            key={item.href}
+            href={item.href}
             className={[
               "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium",
               "transition-colors duration-150",
@@ -42,9 +63,9 @@ export function SidebarNav() {
                 active ? "text-brand-coral" : "text-brand-cream/50",
               ].join(" ")}
             >
-              {icon}
+              {item.icon}
             </span>
-            {label}
+            {item.label}
             {active && (
               <span className="ml-auto w-1.5 h-1.5 rounded-full bg-brand-coral shrink-0" />
             )}
