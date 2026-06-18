@@ -109,8 +109,7 @@ BEGIN
 END;
 $$;
 
--- Eliminar la versión anterior de crear_venta (sin p_fecha_esperada) que
--- quedó de la migración 003 y causa ambigüedad en REVOKE/GRANT.
+-- Eliminar la versión anterior (7 params, de migración 003) para evitar ambigüedad
 DROP FUNCTION IF EXISTS crear_venta(DATE, BIGINT, VARCHAR(10), VARCHAR(10), VARCHAR(10), VARCHAR(10), TEXT);
 
 REVOKE ALL ON FUNCTION crear_venta(DATE, BIGINT, VARCHAR(10), VARCHAR(10), VARCHAR(10), VARCHAR(10), TEXT, DATE) FROM PUBLIC;
