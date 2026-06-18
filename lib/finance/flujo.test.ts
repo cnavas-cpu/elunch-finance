@@ -82,7 +82,7 @@ describe("calcularFlujoReal", () => {
   });
 
   it("salidas cash son salidas reales", () => {
-    const r = calcularFlujoReal([], [salidaCash(3000), salidaCash(2000)]);
+    const r = calcularFlujoReal([salidaCash(3000), salidaCash(2000)], []);
     expect(r.entradas_centavos).toBe(0);
     expect(r.salidas_centavos).toBe(5000);
     expect(r.neto_centavos).toBe(-5000);
