@@ -488,6 +488,55 @@ function DotRojo() {
   );
 }
 
+// ── Leyenda del pipeline CXP ──────────────────────────────────
+
+function PipelineLeyendaCxp() {
+  const pasos = [
+    { n: 1, estado: "Pendiente",   desc: "CXP creada al registrar la compra a crédito" },
+    { n: 2, estado: "Programada",  desc: "Hay fecha de pago acordada con el proveedor" },
+    { n: 3, estado: "Pagada",      desc: "Pago registrado — dinero salió de caja" },
+  ];
+  return (
+    <details className="group bg-surface border border-border/60 rounded-lg">
+      <summary className="px-4 py-2.5 cursor-pointer text-xs font-medium text-text-muted hover:text-brand-cocoa flex items-center gap-2 select-none list-none">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"
+          className="w-3.5 h-3.5 shrink-0" aria-hidden="true">
+          <circle cx="8" cy="8" r="7"/>
+          <path d="M8 7v4M8 5.5h.01" strokeLinecap="round"/>
+        </svg>
+        ¿Cómo funciona el pipeline de pagos?
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2"
+          className="w-3 h-3 ml-auto transition-transform duration-150 group-open:rotate-180" aria-hidden="true">
+          <path d="M2 4l4 4 4-4" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </summary>
+      <div className="px-4 pb-4 pt-2 border-t border-border/40">
+        <div className="flex flex-wrap gap-3 mt-1">
+          {pasos.map((p) => (
+            <div key={p.estado} className="flex items-start gap-2 min-w-[160px]">
+              <span className={cn(
+                "shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5",
+                p.n === 3
+                  ? "bg-status-ok/15 text-status-ok"
+                  : "bg-brand-forest/10 text-brand-forest dark:bg-white/10 dark:text-brand-cream"
+              )}>{p.n}</span>
+              <div>
+                <p className="text-xs font-medium text-foreground leading-tight">{p.estado}</p>
+                <p className="text-[11px] text-text-muted leading-tight">{p.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="text-[11px] text-text-muted mt-3 pt-2 border-t border-border/30">
+          <span className="text-status-danger font-medium">Vencida</span> aparece cuando la fecha de pago ya pasó.{" "}
+          <span className="text-[#7a5100] dark:text-brand-amber font-medium">En disputa</span> pausa el pago mientras se resuelve.
+          El estado <span className="font-medium">Pagada</span> solo se alcanza registrando el abono con el botón "Abonar".
+        </p>
+      </div>
+    </details>
+  );
+}
+
 // ── Componente principal ──────────────────────────────────────
 
 export function CxpClient({ hoy, cxpsIniciales, cuentas }: {
@@ -637,15 +686,30 @@ export function CxpClient({ hoy, cxpsIniciales, cuentas }: {
           )}
         </div>
 
+        {/* Leyenda del pipeline */}
+        <PipelineLeyendaCxp />
+
         {/* Tabla */}
         <TableShell
           empty={
             cxpsFiltradas.length === 0
-              ? <EmptyState mensaje={
+              ? <EmptyState
+                  mensaje={
                     cxps.length === 0
-                      ? "No hay cuentas por pagar. Se generan automáticamente al registrar compras a crédito en el Cierre Diario."
+                      ? "No hay cuentas por pagar aún. Se generan al registrar una compra a crédito en el Cierre Diario."
                       : "Ninguna CXP coincide con los filtros seleccionados."
-                  } />
+                  }
+                  accion={
+                    cxps.length === 0 ? (
+                      <a
+                        href="/cierre"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] bg-brand-coral text-[#1c1712] text-sm font-semibold rounded-lg hover:bg-brand-coral/90 active:bg-brand-coral/80 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-coral focus-visible:ring-offset-2"
+                      >
+                        Ir al Cierre Diario
+                      </a>
+                    ) : undefined
+                  }
+                />
               : undefined
           }
         >

@@ -231,7 +231,15 @@ export function useServerAction(
 
 // ── Estado vacío para tablas ────────────────────────────
 
-export function EmptyState({ mensaje = "No hay registros.", onNew }: { mensaje?: string; onNew?: () => void }) {
+export function EmptyState({
+  mensaje = "No hay registros.",
+  onNew,
+  accion,
+}: {
+  mensaje?: string;
+  onNew?: () => void;
+  accion?: React.ReactNode;
+}) {
   return (
     <div className="flex flex-col items-center justify-center py-14 text-center gap-3">
       <div className="w-10 h-10 rounded-full bg-brand-cream dark:bg-surface-muted flex items-center justify-center text-brand-cocoa/30 dark:text-foreground/40">
@@ -240,6 +248,7 @@ export function EmptyState({ mensaje = "No hay registros.", onNew }: { mensaje?:
         </svg>
       </div>
       <p className="text-sm text-text-muted">{mensaje}</p>
+      {accion && <div className="mt-3">{accion}</div>}
       {onNew && (
         <button
           onClick={onNew}
