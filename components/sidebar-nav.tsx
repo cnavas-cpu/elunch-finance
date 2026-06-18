@@ -13,6 +13,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/cxp",       label: "Cuentas por Pagar",    icon: <CxpIcon /> },
   { href: "/cxc",       label: "Cuentas por Cobrar",   icon: <CxcIcon /> },
   { href: "/reportes", label: "Reportes P&L", icon: <ReportesIcon /> },
+  { href: "/flujo",    label: "Flujo de Caja",          icon: <FlujoIcon /> },
   { href: "/catalogos", label: "Catálogos",             icon: <CatalogosIcon /> },
 ];
 
@@ -118,6 +119,14 @@ function ReportesIcon() {
       <rect x="2" y="9" width="2.5" height="5" rx="0.5" />
       <rect x="6.75" y="6" width="2.5" height="8" rx="0.5" />
       <rect x="11.5" y="3" width="2.5" height="11" rx="0.5" />
+    </svg>
+  );
+}
+function FlujoIcon() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+      <path d="M1 11c1.5-3 3-5 5-5s3.5 3 5 3 3-2.5 4-5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M13 4l2 1-1 2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
