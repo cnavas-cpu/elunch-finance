@@ -12,7 +12,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/cierre",    label: "Cierre Diario",        icon: <CierreIcon /> },
   { href: "/cxp",       label: "Cuentas por Pagar",    icon: <CxpIcon /> },
   { href: "/cxc",       label: "Cuentas por Cobrar",   icon: <CxcIcon /> },
-  { label: "Reportes P&L", icon: <ReportesIcon />, pronto: true },
+  { href: "/reportes", label: "Reportes P&L", icon: <ReportesIcon /> },
   { href: "/catalogos", label: "Catálogos",             icon: <CatalogosIcon /> },
 ];
 
